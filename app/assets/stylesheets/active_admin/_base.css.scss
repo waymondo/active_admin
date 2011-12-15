@@ -9,7 +9,6 @@
 @import "active_admin/forms";
 @import "active_admin/components/comments";
 @import "active_admin/components/flash_messages";
-@import "active_admin/components/date_picker";
 @import "active_admin/components/tables";
 @import "active_admin/components/blank_slates";
 @import "active_admin/components/breadcrumbs";
@@ -21,6 +20,8 @@
 @import "active_admin/components/scopes";
 @import "active_admin/components/status_tags";
 @import "active_admin/components/table_tools";
+@import "active_admin/components/chosen";
+@import "active_admin/components/datetimepicker";
 @import "active_admin/pages/dashboard";
 @import "active_admin/pages/logged_out";
 @import "active_admin/structure/footer";
@@ -36,3 +37,13 @@ body {
   padding: 0;
   color: $text-color;
 }
+
+/* for ckeditor */
+#wrapper .cke_skin_kama {
+	margin-left: 20%;
+}
+/* for autocomplete */
+.chzn, .chzn-container {
+  width: 55%;
+}
+

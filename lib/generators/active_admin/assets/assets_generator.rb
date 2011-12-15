@@ -8,6 +8,9 @@ module ActiveAdmin
       class_option :jquery, :type => :boolean, :default => true,
                    :desc => "Generate jQuery js files if using Rails 3.0.x"
 
+      class_option :rich, :type => :boolean, :default => true,
+                   :desc => "Generate opinionated CKeditor files"
+      
       def self.source_root
         @_active_admin_source_root ||= File.expand_path("../templates", __FILE__)
       end
@@ -16,6 +19,11 @@ module ActiveAdmin
         require 'rails'
         require 'active_admin'
 
+        if options.rich?
+          generate "rich:install" 
+          rake "db:migrate"
+        end
+        
         if ActiveAdmin.use_asset_pipeline?
           template '3.1/active_admin.js', 'app/assets/javascripts/active_admin.js'
           template '3.1/active_admin.css.scss', 'app/assets/stylesheets/active_admin.css.scss'
@@ -25,6 +33,7 @@ module ActiveAdmin
           generate "jquery:install --ui" if options.jquery?
           install_bourbon if options.bourbon?
         end
+
       end
 
       private
@@ -33,7 +42,7 @@ module ActiveAdmin
         rake "bourbon:install"
         create_file "public/stylesheets/sass/_bourbon.scss", '@import "bourbon/bourbon"'
       end
-
+      
     end
   end
 end
