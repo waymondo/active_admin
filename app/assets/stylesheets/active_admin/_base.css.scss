@@ -43,7 +43,13 @@ body {
 #wrapper .cke_skin_kama {
 	margin-left: 20%;
 }
+
 /* for autocomplete */
 .chzn, .chzn-container {
   width: 55%;
+}
+
+/* for sortable */
+tbody.ui-sortable td {
+  cursor: move;
 }

@@ -6,4 +6,5 @@
 //= require active_admin/select-parser
 //= require active_admin/abstract-chosen
 //= require active_admin/chosen.jquery
+//= require active_admin/jquery.reorder
 //= require active_admin/application
