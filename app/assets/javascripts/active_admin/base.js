@@ -8,3 +8,4 @@
 //= require active_admin/chosen.jquery
 //= require active_admin/jquery.reorder
 //= require active_admin/application
+
