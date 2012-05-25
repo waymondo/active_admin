@@ -23,7 +23,8 @@
 @import "active_admin/components/scopes";
 @import "active_admin/components/status_tags";
 @import "active_admin/components/table_tools";
-@import "active_admin/components/chosen";
+/* @import "active_admin/components/chosen"; */
+@import "chosen";
 @import "active_admin/components/datetimepicker";
 @import "active_admin/pages/dashboard";
 @import "active_admin/pages/logged_out";
@@ -42,8 +43,8 @@ body {
 }
 
 /* for ckeditor */
-#wrapper .cke_skin_kama, .cke_skin_BootstrapCK-Skin {
-	margin-left: 20%;
+span.cke_skin_BootstrapCK-Skin {
+	margin-left: 17%;
 }
 
 /* for autocomplete */

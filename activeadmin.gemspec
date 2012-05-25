@@ -27,5 +27,6 @@ Gem::Specification.new do |s|
   s.add_dependency("kaminari", ">= 0.13.0")
   s.add_dependency("sass", ">= 3.1.0")
   s.add_dependency("rich", ">= 0.0.8")
+  s.add_dependency("chosen-rails", ">= 0.9.8")
   s.add_dependency("fastercsv", ">= 0")
 end
