@@ -14,14 +14,22 @@ module ActiveAdmin
     #   end
     #
     def apply(router)
-      # Define any necessary dashboard routes
+      # Define any necessary dashboard routes and root
       router.instance_exec(@application.namespaces.values) do |namespaces|
         namespaces.each do |namespace|
+          root_and_dashboard_routes = Proc.new do
+            root :to => (namespace.root_to || "dashboard#index")
+            if ActiveAdmin::Dashboards.built?
+              match '/dashboard' => 'dashboard#index', :as => 'dashboard'
+            end
+          end
+
           if namespace.root?
-            match '/' => 'dashboard#index', :as => 'dashboard'
+            instance_eval &root_and_dashboard_routes
           else
-            name = namespace.name
-            match name.to_s => "#{name}/dashboard#index", :as => "#{name.to_s}_dashboard"
+            namespace(namespace.name) do
+              instance_eval &root_and_dashboard_routes
+            end
           end
         end
       end
@@ -35,7 +43,7 @@ module ActiveAdmin
           route_definition_block = Proc.new do
             case config
             when Resource
-              resources config.resource_name.route_key do
+              resources config.resource_name.route_key, :only => config.defined_actions do
                 # Define any member actions
                 member do
                   config.member_actions.each do |action|
@@ -55,7 +63,7 @@ module ActiveAdmin
               end
             when Page
 
-              match "/#{config.resource_name.singular}" => "#{config.resource_name.singular}#index"
+              match "/#{config.underscored_resource_name}" => "#{config.underscored_resource_name}#index"
               config.page_actions.each do |action|
                 match "/#{config.underscored_resource_name}/#{action.name}" => "#{config.underscored_resource_name}##{action.name}", :via => action.http_verb
               end
@@ -79,7 +87,7 @@ module ActiveAdmin
 
               # Batch action path is not nested.
               if config.is_a?(Resource)
-                resources config.resource_name.route_key do
+                resources config.resource_name.route_key, :only => config.defined_actions do
                   collection do
                     post :batch_action
                   end
@@ -89,7 +97,7 @@ module ActiveAdmin
           end
 
           # Add on the namespace if required
-          if !config.namespace.root?
+          unless config.namespace.root?
             routes_in_namespace = route_definition_block.dup
             route_definition_block = Proc.new do
               namespace config.namespace.name do
@@ -102,6 +110,5 @@ module ActiveAdmin
         end
       end
     end
-
   end
 end

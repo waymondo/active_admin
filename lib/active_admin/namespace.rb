@@ -145,6 +145,12 @@ module ActiveAdmin
         const_name = resource.controller_name.split('::').last
         # Remove the const if its been defined
         parent.send(:remove_const, const_name) if parent.const_defined?(const_name)
+
+        # Remove circular references
+        resource.controller.active_admin_config = nil
+        if resource.is_a?(Resource) && resource.dsl
+          resource.dsl.run_registration_block { @config = nil }
+        end
       end
       @resources = ResourceCollection.new
     end
@@ -164,26 +170,22 @@ module ActiveAdmin
       config.controller.active_admin_config = config
     end
 
-    def resource_dsl
-      @resource_dsl ||= ResourceDSL.new
-    end
-
     def parse_registration_block(config, &block)
-      resource_dsl.run_registration_block(config, &block)
-    end
-
-    def page_dsl
-      @page_dsl ||= PageDSL.new
+      config.dsl = ResourceDSL.new(config)
+      config.dsl.run_registration_block(&block)
     end
 
     def parse_page_registration_block(config, &block)
-      page_dsl.run_registration_block(config, &block)
+      PageDSL.new(config).run_registration_block(&block)
     end
 
     # Creates a dashboard controller for this config
     def generate_dashboard_controller
-      eval "class ::#{dashboard_controller_name} < ActiveAdmin::Dashboards::DashboardController; end"
-    end
+      return unless ActiveAdmin::Dashboards.built?
 
+      eval "class ::#{dashboard_controller_name} < ActiveAdmin::PageController
+              include ActiveAdmin::Dashboards::DashboardController
+            end"
+    end
   end
 end

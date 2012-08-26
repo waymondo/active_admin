@@ -6,21 +6,11 @@ require 'spec_helper'
 describe "Memory Leak" do
 
   def count_instances_of(klass)
-    count = 0
-
-    ObjectSpace.each_object do |o|
-      if o.class == klass
-        count += 1
-      end
-    end
-
-    count
+    ObjectSpace.each_object(klass) { }
   end
 
   def self.it_should_not_leak(klass)
     it "should not leak #{klass}" do
-      pending
-
       GC.start
 
       count = count_instances_of(klass)

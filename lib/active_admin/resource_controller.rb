@@ -3,8 +3,8 @@ require 'active_admin/resource_controller/actions'
 require 'active_admin/resource_controller/action_builder'
 require 'active_admin/resource_controller/callbacks'
 require 'active_admin/resource_controller/collection'
-require 'active_admin/resource_controller/filters'
 require 'active_admin/resource_controller/scoping'
+require 'active_admin/resource_controller/sidebars'
 require 'active_admin/resource_controller/resource_class_methods'
 
 module ActiveAdmin
@@ -22,17 +22,17 @@ module ActiveAdmin
     include ActionBuilder
     include Callbacks
     include Collection
-    include Filters
     include Scoping
+    include Sidebars
     extend  ResourceClassMethods
 
     class << self
       def active_admin_config=(config)
         @active_admin_config = config
 
-        defaults  :resource_class => config.resource_class,
-                  :route_prefix => config.route_prefix,
-                  :instance_name => config.resource_name.singular
+        unless config.nil?
+          defaults :resource_class => config.resource_class, :route_prefix => config.route_prefix, :instance_name => config.resource_name.singular
+        end
       end
 
       # Inherited Resources uses the inherited(base) hook method to 

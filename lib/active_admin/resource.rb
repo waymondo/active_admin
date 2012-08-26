@@ -47,6 +47,9 @@ module ActiveAdmin
     # Set the configuration for the CSV
     attr_writer :csv_builder
 
+    # Store a reference to the DSL so that we can dereference it during garbage collection.
+    attr_accessor :dsl
+
     module Base
       def initialize(namespace, resource_class, options = {})
         @namespace = namespace
@@ -107,6 +110,11 @@ module ActiveAdmin
 
     def clear_collection_actions!
       @collection_actions = []
+    end
+
+    # Return only defined resource actions
+    def defined_actions
+      controller.instance_methods.map { |m| m.to_sym } & ResourceController::ACTIVE_ADMIN_ACTIONS
     end
 
     # Are admin notes turned on for this resource

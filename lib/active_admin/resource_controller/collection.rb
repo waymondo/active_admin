@@ -88,16 +88,19 @@ module ActiveAdmin
         end
 
         def scope_current_collection(chain)
+          @collection_before_scope = chain
+
           if current_scope
-            @before_scope_collection = chain
             scope_chain(current_scope, chain)
-          elsif active_admin_config.scope_to
-            @before_scope_collection = scoped_collection
-            chain
           else
             chain
           end
         end
+
+        def collection_before_scope
+          @collection_before_scope
+        end
+
 
         include ActiveAdmin::ScopeChain
 
@@ -119,8 +122,11 @@ module ActiveAdmin
         end
 
         def paginate(chain)
-          chain.send(Kaminari.config.page_method_name, params[:page]).per(per_page)
-        end
+          page_method_name = Kaminari.config.page_method_name
+          page = params[Kaminari.config.param_name]
+
+          chain.send(page_method_name, page).per(per_page)
+	end
 
         def per_page
           return max_csv_records if request.format == 'text/csv'

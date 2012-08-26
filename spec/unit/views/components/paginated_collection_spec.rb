@@ -2,21 +2,33 @@ require 'spec_helper'
 
 describe ActiveAdmin::Views::PaginatedCollection do
   describe "creating with the dsl" do
-    setup_arbre_context!
-
-    let(:collection) do
-      posts = [Post.new(:title => "First Post"), Post.new(:title => "Second Post"), Post.new(:title => "Third Post")]
-      Kaminari.paginate_array(posts).page(1).per(5)
-    end
 
     before :all do
       load_defaults!
       reload_routes!
     end
 
+    let(:view) do
+      view = mock_action_view
+      view.request.stub!(:query_parameters).and_return({:controller => 'admin/posts', :action => 'index', :page => '1'})
+      view.controller.params = {:controller => 'admin/posts', :action => 'index'}
+      view
+    end
+
+    # Helper to render paginated collections within an arbre context
+    def paginated_collection(*args)
+      render_arbre_component({:paginated_collection_args => args}, view) do
+        paginated_collection(*paginated_collection_args)
+      end
+    end
+
+    let(:collection) do
+      posts = [Post.new(:title => "First Post"), Post.new(:title => "Second Post"), Post.new(:title => "Third Post")]
+      Kaminari.paginate_array(posts).page(1).per(5)
+    end
+
     before do
-      request.stub!(:query_parameters).and_return({:controller => 'admin/posts', :action => 'index', :page => '1'})
-      controller.params = {:controller => 'admin/posts', :action => 'index'}
+      collection.stub!(:reorder) { collection }
     end
 
     context "when specifying collection" do
@@ -116,7 +128,7 @@ describe ActiveAdmin::Views::PaginatedCollection do
       end
 
       it "should use 'Singular' as the collection name when there is an I18n translation" do
-        I18n.stub(:translate!) { "Singular" }
+        I18n.stub(:translate) { "Singular" }
         pagination.find_by_class('pagination_information').first.content.should == "Displaying <b>1</b> Singular"
       end
     end
@@ -129,7 +141,7 @@ describe ActiveAdmin::Views::PaginatedCollection do
       end
 
       it "should use 'Plural' as the collection name when there is an I18n translation" do
-        I18n.stub(:translate!) { "Plural" }
+        I18n.stub(:translate) { "Plural" }
         pagination.find_by_class('pagination_information').first.content.should == "Displaying <b>all 3</b> Plural"
       end
     end
@@ -171,6 +183,20 @@ describe ActiveAdmin::Views::PaginatedCollection do
       it "should display proper message (including number and not hash)" do
         pagination.find_by_class('pagination_information').first.content.
           gsub('&nbsp;',' ').should == "Displaying posts <b>1 - 2</b> of <b>3</b> in total"
+      end
+    end
+
+    context "when viewing the last page of a collection that has multiple pages" do
+      let(:collection) do
+        posts = [Post.new] * 81
+        Kaminari.paginate_array(posts).page(3).per(30)
+      end
+
+      let(:pagination) { paginated_collection(collection) }
+
+      it "should show the proper item counts" do
+        pagination.find_by_class('pagination_information').first.content.
+            gsub('&nbsp;',' ').should == "Displaying posts <b>61 - 81</b> of <b>81</b> in total"
       end
     end
 
