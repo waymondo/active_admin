@@ -1,3 +1,7 @@
+/*
+ *= require chosen
+ */
+
 /* Active Admin CSS */
 // Reset Away!
 body.active_admin {
@@ -9,6 +13,7 @@ body.active_admin {
     @import "active_admin/typography";
     @import "active_admin/header";
     @import "active_admin/forms";
+    @import "active_admin/components/autocomplete_collection";
     @import "active_admin/components/comments";
     @import "active_admin/components/flash_messages";
     @import "active_admin/components/datetimepicker";
@@ -20,6 +25,7 @@ body.active_admin {
     @import "active_admin/components/dropdown_menu";
     @import "active_admin/components/buttons";
     @import "active_admin/components/grid";
+    @import "active_admin/components/dropdown";
     @import "active_admin/components/links";
     @import "active_admin/components/pagination";
     @import "active_admin/components/panels";
@@ -42,19 +48,20 @@ body.active_admin {
   margin: 0;
   padding: 0;
   color: $text-color;
-}
 
-/* for ckeditor */
-span.cke_skin_BootstrapCK-Skin {
-	margin-left: 17%;
-}
+  /* for ckeditor */
+  span.cke_skin_BootstrapCK-Skin {
+	  margin-left: 17%;
+  }
 
-/* for autocomplete */
-.chzn, .chzn-container {
-  width: 55%;
-}
+  /* for autocomplete */
+  .chzn, .chzn-container {
+    width: 55%;
+  }
 
-/* for sortable */
-tbody.ui-sortable td {
-  cursor: move;
+  /* for sortable */
+  tbody.ui-sortable td {
+    cursor: move;
+  }
+
 }

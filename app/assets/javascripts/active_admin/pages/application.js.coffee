@@ -5,11 +5,11 @@
 $ = jQuery
 $ ->
 
-  $(".datepicker").datepicker dateFormat: "yy-mm-dd"
-  $(".timepicker").timepicker ampm: true
-  $(".datetimepicker").datetimepicker
-    dateFormat: 'yy-mm-dd'
-    ampm: true
+  $("input.datepicker").datepicker dateFormat: "yy-mm-dd"
+  $("input.timepicker").timepicker() # ampm: true
+  # $(".datetimepicker").datetimepicker
+  #   dateFormat: 'yy-mm-dd'
+  #   ampm: true
 
   $(".clear_filters_btn").click ->
     window.location.search = ""
@@ -18,6 +18,10 @@ $ ->
   $(".dropdown_button").popover()
 
   $(".chzn").chosen()
+
+  $("input[type='text'].data-collection").each ->
+    # console.log(v.split(","))
+    $(@).autocomplete_collection()
 
   $('form').bind 'submit', ->
     $("li.autocomplete").each ->
