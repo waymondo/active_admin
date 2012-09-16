@@ -29,5 +29,5 @@ Gem::Specification.new do |s|
   s.add_dependency("rich", ">= 1.2.0")
   s.add_dependency("chosen-rails", ">= 0.9.8")
   s.add_dependency("fastercsv", ">= 0")
-  s.add_dependency("arbre", ">= 1.0.0.rc4")
+  s.add_dependency("arbre", ">= 1.0.1")
 end

@@ -1,5 +1,7 @@
 ## Master (unreleased)
 
+## 0.5.0
+
 ### Enhancements
 
 * Created new view components (Footer, TitleBar, Header, UtilityNav) to more
@@ -9,8 +11,11 @@
   other areas of your application.
 * Dashboards are now implemented as pages. For more details of how to configure
   a page, checkout http://activeadmin.info/docs/9-custom-pages.html
+* Root route can be set to any controller#action using `#root_to`.
 * Batch Actions allows you to select entries on index page and perform
   an action against them.
+* CSV separators are configurable.
+* Lot of bug fixes.
 
 ### Deprecations
 
@@ -25,9 +30,9 @@
   and using the new `config.root_to` option.
 * Arbre is now a gem on its own.
 
-### Contributors
+### Contributions
 
-456 commits (120 Pull Requests) by 72 contributors.
+561 commits (142 Pull Requests) by 88 contributors.
 
 ## 0.4.4
 

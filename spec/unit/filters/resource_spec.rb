@@ -28,6 +28,12 @@ describe ActiveAdmin::Filters::ResourceExtension do
     resource.filters.should be_empty
   end
 
+  it "should remove a filter" do
+    resource.filters.should include({:attribute => :author})
+    resource.remove_filter :author
+    resource.filters.should_not include({:attribute => :author})
+  end
+
   it "should add a filter" do
     resource.add_filter :title
     resource.filters.should == [{:attribute => :title}]
@@ -36,6 +42,14 @@ describe ActiveAdmin::Filters::ResourceExtension do
   it "should add a filter with options" do
     resource.add_filter :title, :as => :string
     resource.filters.should == [{:attribute => :title, :as => :string}]
+  end
+
+  it "should preserve default filters" do
+    resource.preserve_default_filters!
+    resource.add_filter :count, :as => :string
+    resource.filters.map{|f| f[:attribute].to_s }.sort.should == %w{
+      author body category count created_at published_at title updated_at
+    }
   end
 
   it "should raise an exception if trying to add a filter when they are disabled" do

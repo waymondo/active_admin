@@ -15,11 +15,11 @@ module ActiveAdmin
       #
       def fields_for_params(params, options = {})
         namespace = options[:namespace]
-        except = options[:except]
+        except = options[:except].is_a?(Array) ? options[:except] : [options[:except]]
 
         params.map do |k, v|
           next if namespace.nil? && %w(controller action commit utf8).include?(k.to_s)
-          next if except && k.to_s == except.to_s
+          next if except.map(&:to_s).include?(k.to_s)
 
           if namespace
             k = "#{namespace}[#{k}]"
@@ -28,6 +28,8 @@ module ActiveAdmin
           case v
           when String
             { k => v }
+          when Symbol
+            { k => v.to_s }
           when Hash
             fields_for_params(v, :namespace => k)
           when Array

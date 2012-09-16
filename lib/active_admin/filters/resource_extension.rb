@@ -15,7 +15,15 @@ module ActiveAdmin
       def filters
         return [] unless filters_enabled?
 
-        @filters || default_filters
+        if @filters.present?
+          if preserve_default_filters?
+            @filters + default_filters
+          else
+            @filters
+          end
+        else
+          default_filters
+        end
       end
 
       # Setter to enable / disable filters on this resource.
@@ -30,11 +38,33 @@ module ActiveAdmin
         @filters_enabled.nil? ? namespace.filters : @filters_enabled
       end
 
+      def preserve_default_filters!
+        @preserve_default_filters = true
+      end
+
+      def preserve_default_filters?
+        @preserve_default_filters == true
+      end
+
+      # Remove a filter for this resource. If filters are not enabled, this method
+      # will raise a RuntimeError
+      #
+      # @param [Symbol] attribute The attribute to not filter on
+      def remove_filter(attribute)
+        unless filters_enabled?
+          raise RuntimeError, "Can't remove a filter when filters are disabled. Enable filters with 'config.filters = true'"
+        end
+
+        @filters ||= default_filters
+
+        @filters.delete_if { |f| f.fetch(:attribute) == attribute }
+      end
+
       # Add a filter for this resource. If filters are not enabled, this method
       # will raise a RuntimeError
       #
       # @param [Symbol] attribute The attribute to filter on
-      # @param [Hash] options The set of options that are passed through to 
+      # @param [Hash] options The set of options that are passed through to
       #                       metasearch for the field definition.
       def add_filter(attribute, options = {})
         unless filters_enabled?
