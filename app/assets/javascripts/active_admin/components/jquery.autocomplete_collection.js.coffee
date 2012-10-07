@@ -93,6 +93,18 @@ AutocompleteCollection.prototype =
     @collection.splice i, 1
     @$hidden.val JSON.stringify @collection
 
+  collection_reorder: (ids) ->
+    that = @
+    ordered_collection = []
+    for id, i in ids
+      do (id) ->
+        index = that.index_in_collection(id)
+        val = that.collection[index]
+        val.position = i + 1
+        ordered_collection.push val
+    @collection = ordered_collection
+    @$hidden.val JSON.stringify @collection
+
   remove: (val) ->
     if (i = @index_in_collection(val.id)) > -1
       @collection_remove(i)
@@ -103,6 +115,11 @@ AutocompleteCollection.prototype =
     $.each @collection, (i, val) ->
       that.draw(val)
     @$hidden.val JSON.stringify @collection
+    if $.fn.sortable?
+      @$collection.sortable
+        stop: (e, ui) ->
+          collection_ids = that.$collection.find("[data-autocomplete-collection-id]").map( -> parseInt $(@).attr("data-autocomplete-collection-id") ).get()
+          that.collection_reorder(collection_ids)
 
   lookup: (event) ->
     that = @

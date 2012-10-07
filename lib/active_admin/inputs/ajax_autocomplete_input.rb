@@ -11,10 +11,10 @@ module ActiveAdmin
         options
       end
       def collection_as_json
-        collection = @object.send("#{association_primary_key || method}") || []
-        reflection = reflection_for(method)
-        # collection.map{|o| { id: o.id, name: o.name }}.to_json
-        reflection.klass.find(collection).map{|o| { id: o.id, name: o.name }}.to_json
+        # collection = @object.send("#{association_primary_key || method}") || []
+        # reflection = reflection_for(method)
+        @object.send(method).map{|o| { id: o.id, name: o.name }}.to_json
+        # reflection.klass.find(collection).map{|o| { id: o.id, name: o.name }}.to_json
       end
 
       def method
