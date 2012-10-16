@@ -6,7 +6,7 @@ module ActiveAdmin
         options[:class] = [options[:class], "ajax-autocomplete"].compact.join(' ')
         options[:value] = ""
         options[:placeholder] = "Type to search..."
-        options[:data][:collection] =|| collection_as_json
+        options[:data][:collection] = options[:data][:collection] || collection_as_json
         options[:data][:provide] = "autocomplete-collection"
         options
       end
