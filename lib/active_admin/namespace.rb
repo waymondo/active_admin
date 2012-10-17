@@ -173,6 +173,21 @@ module ActiveAdmin
     def parse_registration_block(config, &block)
       config.dsl = ResourceDSL.new(config)
       config.dsl.run_registration_block(&block)
+
+      # Add any other convenience controller actions not included in inherited_resources.
+      config.dsl.run_registration_block do
+
+        # Add sort controller action if class is sortable.
+        if config.resource_class.attribute_names.include?("position")
+          klass = config.resource_class
+          collection_action :sort, :method => :post do
+            params[:sort].split(",").each_with_index do |id, index|
+              klass.update_all(['position=?', index+1], ['id=?', id])
+            end
+            head :ok
+          end
+        end
+      end
     end
 
     def parse_page_registration_block(config, &block)
