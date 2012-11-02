@@ -7,7 +7,6 @@ $ ->
         $tr = $(@).find("tr")
         tr_ids = $tr.map( -> @.id.split("_")[1] ).toArray().join(",")
         route = "#{resource}/sort"
-        console.log(route)
         $.post "#{resource}/sort", sort: tr_ids, ->
           # update position numbering and fix striping
           $table.find("tr").each (i) ->
