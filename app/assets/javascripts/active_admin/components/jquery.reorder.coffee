@@ -5,7 +5,7 @@ $ ->
     $table.find("tbody").sortable
       update: (e, ui) ->
         $tr = $(@).find("tr")
-        tr_ids = $tr.map( -> @.id.split("_")[1] ).toArray().join(",")
+        tr_ids = $tr.map( -> @.id.split("_").pop() ).toArray().join(",")
         route = "#{resource}/sort"
         $.post "#{resource}/sort", sort: tr_ids, ->
           # update position numbering and fix striping
