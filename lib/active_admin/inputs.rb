@@ -7,6 +7,7 @@ module ActiveAdmin
     autoload :DatetimepickerInput
     autoload :AutocompleteInput
     autoload :AjaxAutocompleteInput
+    autoload :RedactoredInput
 
     autoload :FilterBase
     autoload :FilterStringInput
