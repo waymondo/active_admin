@@ -1,6 +1,5 @@
 module ActiveAdmin
   class Engine < Rails::Engine
-    require 'rich'
     require 'redactor-rails'
     if Rails.version > "3.1"
       initializer "ActiveAdmin precompile hook" do |app|

@@ -8,8 +8,8 @@ module ActiveAdmin
       class_option :jquery, :type => :boolean, :default => true,
                    :desc => "Generate jQuery js files if using Rails 3.0.x"
 
-      class_option :rich, :type => :boolean, :default => true,
-                   :desc => "Generate opinionated CKeditor files"
+      class_option :redactor, :type => :boolean, :default => true,
+                   :desc => "Install redactor WSYIWIG editor"
 
       def self.source_root
         @_active_admin_source_root ||= File.expand_path("../templates", __FILE__)
@@ -19,8 +19,8 @@ module ActiveAdmin
         require 'rails'
         require 'active_admin'
 
-        if options.rich?
-          generate "rich:install"
+        if options.redactor?
+          generate "redactor:install"
           rake "db:migrate"
         end
 
