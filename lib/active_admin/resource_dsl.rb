@@ -18,7 +18,7 @@ module ActiveAdmin
     #   end
     #
     # Then every time we instantiate and object, it would call
-    #   
+    #
     #   current_user.posts.build
     #
     # By default Active Admin will use the resource name to build a
@@ -28,7 +28,7 @@ module ActiveAdmin
     #   scope_to :current_user, :association_method => :blog_posts
     #
     # will result in the following
-    # 
+    #
     #   current_user.blog_posts.build
     #
     def scope_to(*args, &block)
@@ -68,7 +68,7 @@ module ActiveAdmin
     #     column("Author") { |post| post.author.full_name }
     #   end
     #
-    #   csv :separator => ";" do
+    #   csv :separator => ";", :options => { :force_quotes => true } do
     #     column :name
     #   end
     #
@@ -94,9 +94,9 @@ module ActiveAdmin
     #
     # You can treat everything within the block as a standard Rails controller
     # action.
-    # 
-    def member_action(name, options = {}, &block)
-      config.member_actions << ControllerAction.new(name, options)
+    #
+    def action(set, name, options = {}, &block)
+      set << ControllerAction.new(name, options)
       title = options.delete(:title)
 
       controller do
@@ -105,14 +105,12 @@ module ActiveAdmin
       end
     end
 
-    def collection_action(name, options = {}, &block)
-      config.collection_actions << ControllerAction.new(name, options)
-      title = options.delete(:title)
+    def member_action(name, options = {}, &block)
+      action config.member_actions, name, options, &block
+    end
 
-      controller do
-        before_filter(:only => [name]){ @page_title = title } if title
-        define_method(name, &block || Proc.new{})
-      end
+    def collection_action(name, options = {}, &block)
+      action config.collection_actions, name, options, &block
     end
 
     # Defined Callbacks
@@ -151,7 +149,7 @@ module ActiveAdmin
     # Specify which actions to create in the controller
     #
     # Eg:
-    #   
+    #
     #   ActiveAdmin.register Post do
     #     actions :index, :show
     #   end
