@@ -6,7 +6,12 @@ $ = jQuery
 $ ->
 
   $("input.datepicker").datepicker dateFormat: "yy-mm-dd"
-  $("input.timepicker").timepicker() # ampm: true
+  $("input.timepicker").each ->
+    $i = $(@)
+    $i.timepicker
+      minTime: $i.attr('data-minTime')
+      maxTime: $i.attr('data-maxTime')
+      selectOnBlur: $i.attr('data-selectOnBlur')?
   # $(".datetimepicker").datetimepicker
   #   dateFormat: 'yy-mm-dd'
   #   ampm: true
