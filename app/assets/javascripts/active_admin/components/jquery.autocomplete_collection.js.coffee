@@ -9,7 +9,7 @@ AutocompleteCollection = (element, options) ->
   @highlighter = @options.highlighter or @highlighter
   @$menu = $(@options.menu).appendTo('body')
   @$collection = $(@options.collection_ui).insertAfter(@$element)
-  @collection = @options.collection or @collection
+  @collection = @options.collection or JSON.parse(@$element.attr('data-collection')) or []
   @source = @options.source or @source
   @onselect = @options.onselect
   @onenter = @options.onenter
@@ -22,8 +22,8 @@ AutocompleteCollection.prototype =
 
   constructor: AutocompleteCollection
 
-  collection: ->
-    JSON.parse @$element.attr('data-collection') or []
+  # collection: ->
+  #   JSON.parse(@$element.attr('data-collection')) or []
 
   collection_ids: ->
     $.map @collection, (o) -> o.id
@@ -33,10 +33,10 @@ AutocompleteCollection.prototype =
 
   source: (autocomplete_collection, query) ->
     url = @$element.attr('data-json-url')
-    xhr = $.getJSON "#{url}?q=#{query}"
-    # xhr = $.getJSON "bands.json"
-    xhr.complete (data) ->
+    xhr = $.getJSON(url+query)
+    xhr.complete (data) =>
       resp = JSON.parse(data.responseText)
+      resp = resp[@options.method] or resp
       autocomplete_collection.process(resp)
 
   select: (go) ->
