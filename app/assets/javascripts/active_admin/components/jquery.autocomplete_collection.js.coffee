@@ -1,9 +1,11 @@
 AutocompleteCollection = (element, options) ->
+  @options = $.extend({}, $.fn.autocomplete_collection.defaults, options)
+  @resource = @options.resource or @options.method
   @$element = $(element)
   @$element.wrap $(document.createElement('div')).addClass('autocomplete-collection-wrap')
   @$hidden = @$element.clone().attr('type','hidden').insertAfter(@$element)
+  @$hidden.attr 'name', @$element.attr('name')
   @$element.removeAttr 'name'
-  @options = $.extend({}, $.fn.autocomplete_collection.defaults, options)
   @matcher = @options.matcher or @matcher
   @sorter = @options.sorter or @sorter
   @highlighter = @options.highlighter or @highlighter
@@ -70,7 +72,7 @@ AutocompleteCollection.prototype =
     $li = $(document.createElement("li"))
       .addClass("autocomplete-collection-collection-item")
       .attr('data-autocomplete-collection-id', val.id)
-      .html val.name
+      .html val[@options.property]
     $x = $(document.createElement("a"))
       .addClass("autocomplete-collection-remove-item")
       .html("&times;")
@@ -85,13 +87,17 @@ AutocompleteCollection.prototype =
       @draw(val)
       @collection_add(val)
 
+  setValue: ->
+    @$hidden.val JSON.stringify @collection
+    # @$hidden.val $.map(@collection, (o) -> "'#{o.id.toString()}'" ).join(",")
+
   collection_add: (val) ->
     @collection.push(val)
-    @$hidden.val JSON.stringify @collection
+    @setValue()
 
   collection_remove: (i) ->
     @collection.splice i, 1
-    @$hidden.val JSON.stringify @collection
+    @setValue()
 
   collection_reorder: (ids) ->
     that = @
@@ -103,7 +109,7 @@ AutocompleteCollection.prototype =
         val.position = i + 1
         ordered_collection.push val
     @collection = ordered_collection
-    @$hidden.val JSON.stringify @collection
+    @setValue()
 
   remove: (val) ->
     if (i = @index_in_collection(val.id)) > -1
@@ -114,7 +120,7 @@ AutocompleteCollection.prototype =
     that = @
     $.each @collection, (i, val) ->
       that.draw(val)
-    @$hidden.val JSON.stringify @collection
+    @setValue()
     if $.fn.sortable?
       @$collection.sortable
         stop: (e, ui) ->
