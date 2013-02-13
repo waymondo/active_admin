@@ -12,9 +12,6 @@ $ ->
       minTime: $i.attr('data-minTime')
       maxTime: $i.attr('data-maxTime')
       selectOnBlur: $i.attr('data-selectOnBlur')?
-  # $(".datetimepicker").datetimepicker
-  #   dateFormat: 'yy-mm-dd'
-  #   ampm: true
 
   $(".clear_filters_btn").click ->
     window.location.search = ""
