@@ -15,6 +15,7 @@ AutocompleteCollection = (element, options) ->
   @source = @options.source or @source
   @onselect = @options.onselect
   @onenter = @options.onenter
+  @allowNew = @options.allowNew
   @strings = true
   @shown = false
   @build()
@@ -52,6 +53,16 @@ AutocompleteCollection.prototype =
       @onselect(val, go)
     @add(val)
     @hide()
+
+  add_new: ->
+    text = @$element.val()
+    if !@strings
+      val = {}
+      val[@options.property] = text
+    else
+      val = text
+    @add(val)
+    @$element.val("")
 
   show: ->
     pos = $.extend {}, @$element.offset(),
@@ -233,10 +244,11 @@ AutocompleteCollection.prototype =
         break
       when 9, 13 # tab / enter
         if !@shown
-          if typeof @onenter == "function"
-            @onenter()
-          return
-        @select()
+          @onenter() if typeof @onenter == "function"
+          @add_new() if @allowNew
+          return false
+        else
+          @select()
         break
       when 27 # escape
         @hide()
@@ -246,8 +258,8 @@ AutocompleteCollection.prototype =
 
   keypress: (e) ->
     e.stopPropagation()
-    if !@shown
-      return
+    # if !@shown
+    #   return
 
     switch e.keyCode
       when 9, 13, 27 # tab / enter / escape
@@ -297,6 +309,7 @@ $.fn.autocomplete_collection.defaults =
   item: '<li><a href="#"></a></li>'
   onselect: null
   onenter: null
+  allowNew: false
   property: 'name'
 
 $.fn.autocomplete_collection.Constructor = AutocompleteCollection
@@ -305,6 +318,5 @@ $ ->
 
   $('[data-provide="autocomplete-collection"]').each ->
     $this = $(@)
-    if $this.data('autocomplete-collection')
-      return
+    return if $this.data('autocomplete-collection')
     $this.autocomplete_collection($this.data())
