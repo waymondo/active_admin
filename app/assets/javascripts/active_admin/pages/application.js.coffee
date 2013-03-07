@@ -8,10 +8,7 @@ $ ->
   $("input.datepicker").datepicker dateFormat: "yy-mm-dd"
   $("input.timepicker").each ->
     $i = $(@)
-    $i.timepicker
-      minTime: $i.attr('data-minTime')
-      maxTime: $i.attr('data-maxTime')
-      selectOnBlur: $i.attr('data-selectOnBlur')?
+    $i.timepicker $i.data()
 
   $(".clear_filters_btn").click ->
     window.location.search = ""
