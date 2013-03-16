@@ -1,18 +1,15 @@
-#
-# Active Admin JS
-#
-
-$ = jQuery
+# Initializers
 $ ->
 
-  $("input.datepicker").datepicker dateFormat: "yy-mm-dd"
+  $(document).on 'focus', '.datepicker:not(.hasDatepicker)', ->
+    $(@).datepicker dateFormat: 'yy-mm-dd'
+
   $("input.timepicker").each ->
     $i = $(@)
     $i.timepicker $i.data()
 
   $(".clear_filters_btn").click ->
     window.location.search = ""
-    false
 
   $(".dropdown_button").popover()
 
@@ -30,3 +27,7 @@ $ ->
           $li.find('.chzn-done option[selected]').removeAttr('selected')
           $li.find('.chzn-done option').first().attr('selected', 'selected')
     true
+
+  # Filter form: don't send any inputs that are empty
+  $('#q_search').submit ->
+    $(@).find(':input[value=""]').attr 'disabled', 'disabled'
