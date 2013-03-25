@@ -258,7 +258,11 @@ AutocompleteCollection.prototype =
 
 
   move: (e) ->
-    return false if !@shown
+    if !@shown
+      if e.keyCode == 13
+        return false
+      else
+        return
 
     switch e.keyCode
       when 9, 13, 27
@@ -293,7 +297,7 @@ AutocompleteCollection.prototype =
         @select()
       when 13 # enter
         if !@shown
-          @onenter() if typeof @onenter == "function"
+          @onenter(e) if typeof @onenter == "function"
           @select() if @allowNew
         else
           @select()

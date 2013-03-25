@@ -15,9 +15,9 @@ $ ->
 
   $(".chzn").chosen()
 
-  $("input[type='text'].data-collection").each ->
-    # console.log(v.split(","))
-    $(@).autocomplete_collection()
+  # $("input[type='text'].data-collection").each ->
+  #   # console.log(v.split(","))
+  #   $(@).autocomplete_collection()
 
   $('form').bind 'submit', ->
     $("li.autocomplete").each ->
