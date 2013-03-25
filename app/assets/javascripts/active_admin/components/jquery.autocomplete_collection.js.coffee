@@ -10,7 +10,7 @@ AutocompleteCollection = (element, options) ->
   @sorter = @options.sorter or @sorter
   @highlighter = @options.highlighter or @highlighter
   @$menu = $(@options.menu).appendTo('body')
-  @$collection = $(@options.collection_ui).insertAfter(@$element)
+  @$collection = $(@options.collectionUi).insertAfter(@$element)
   @collection = @options.collection or JSON.parse(@$element.attr('data-collection')) or []
   @source = @options.source or @source
   @onselect = @options.onselect
@@ -28,11 +28,11 @@ AutocompleteCollection.prototype =
   # collection: ->
   #   JSON.parse(@$element.attr('data-collection')) or []
 
-  collection_ids: ->
+  collectionIds: ->
     $.map @collection, (o) -> o.id
 
-  index_in_collection: (id) ->
-    $.inArray id, @collection_ids()
+  indexInCollection: (id) ->
+    $.inArray id, @collectionIds()
 
   source: (autocomplete_collection, query) ->
     url = @$element.attr('data-json-url')
@@ -43,26 +43,36 @@ AutocompleteCollection.prototype =
       autocomplete_collection.process(resp)
 
   select: (go) ->
-    val = JSON.parse(@$menu.find('.active').attr('data-value'))
-    if !@strings
-      text = val[@options.property]
+    $active = @$menu.find('.active')
+    if @allowNew and ($active.find("a").hasClass("add-new") or !@shown)
+      @addNew()
     else
-      text = val
-    @$element.val(text)
-    if typeof @onselect == "function"
-      @onselect(val, go)
-    @add(val)
+      val = JSON.parse($active.attr('data-value'))
+      text = @getVal(val)
+      @$element.val(text)
+      @onselect(val, go) if typeof @onselect == "function"
+      @add(val)
     @hide()
 
-  add_new: ->
+  addNew: ->
     text = @$element.val()
+    val = @setVal(text)
+    @add(val)
+    @$element.val("")
+
+  getVal: (val) ->
+    if !@strings
+      val[@options.property]
+    else
+      val
+
+  setVal: (text) ->
     if !@strings
       val = {}
       val[@options.property] = text
+      val
     else
-      val = text
-    @add(val)
-    @$element.val("")
+      text
 
   show: ->
     pos = $.extend {}, @$element.offset(),
@@ -82,6 +92,7 @@ AutocompleteCollection.prototype =
   draw: (val) ->
     $li = $(document.createElement("li"))
       .addClass("autocomplete-collection-collection-item")
+      .attr('data-autocomplete-collection-value', val[@options.property])
       .attr('data-autocomplete-collection-id', val.id)
       .html val[@options.property]
     $x = $(document.createElement("a"))
@@ -92,40 +103,44 @@ AutocompleteCollection.prototype =
     @$collection.append $li
     @$element.val ""
 
-
-  add: (val) ->
-    if i = @index_in_collection(val.id) == -1
-      @draw(val)
-      @collection_add(val)
-
   setValue: ->
     @$hidden.val JSON.stringify @collection
     # @$hidden.val $.map(@collection, (o) -> "'#{o.id.toString()}'" ).join(",")
 
-  collection_add: (val) ->
+  collectionAdd: (val) ->
     @collection.push(val)
     @setValue()
 
-  collection_remove: (i) ->
+  collectionRemove: (i) ->
     @collection.splice i, 1
     @setValue()
 
-  collection_reorder: (ids) ->
+  collectionReorder: (ids) ->
     that = @
     ordered_collection = []
     for id, i in ids
       do (id) ->
-        index = that.index_in_collection(id)
+        index = that.indexInCollection(id)
         val = that.collection[index]
         val.position = i + 1
         ordered_collection.push val
     @collection = ordered_collection
     @setValue()
 
+  add: (val) ->
+    if i = @indexInCollection(val.id) == -1
+      @draw(val)
+      @collectionAdd(val)
+
   remove: (val) ->
-    if (i = @index_in_collection(val.id)) > -1
-      @collection_remove(i)
+    if (i = @indexInCollection(val.id)) > -1
+      @collectionRemove(i)
       @$collection.find("[data-autocomplete-collection-id='#{val.id}']").remove()
+    else if @allowNew
+      text = @getVal(val)
+      if ($item = @$collection.find("[data-autocomplete-collection-value='#{text}']")).length
+        @collectionRemove(i)
+        $item.remove()
 
   build: ->
     that = @
@@ -135,8 +150,10 @@ AutocompleteCollection.prototype =
     if $.fn.sortable?
       @$collection.sortable
         stop: (e, ui) ->
-          collection_ids = that.$collection.find("[data-autocomplete-collection-id]").map( -> parseInt $(@).attr("data-autocomplete-collection-id") ).get()
-          that.collection_reorder(collection_ids)
+          collectionIds = that.$collection.find("[data-autocomplete-collection-id]").map( ->
+            parseInt $(@).attr("data-autocomplete-collection-id")
+          ).get()
+          that.collectionReorder(collectionIds)
 
   lookup: (event) ->
     that = @
@@ -204,6 +221,10 @@ AutocompleteCollection.prototype =
         return i[0]
     items.first().addClass('active')
     @$menu.html(items)
+    if @allowNew
+      $addNewLi = $(@options.item)
+      $addNewLi.find("a").addClass('add-new icon-plus').html("Add new item")
+      @$menu.append $addNewLi
     @
 
   next: (event) ->
@@ -235,46 +256,63 @@ AutocompleteCollection.prototype =
       .on('click', $.proxy(@click, @))
       .on('mouseenter', 'li', $.proxy(@mouseenter, @))
 
-  keyup: (e) ->
+
+  move: (e) ->
+    return false if !@shown
+
+    switch e.keyCode
+      when 9, 13, 27
+        e.preventDefault()
+        break
+      when 38
+        e.preventDefault()
+        @prev()
+        break
+      when 40
+        e.preventDefault()
+        @next()
+        break
+
     e.stopPropagation()
-    e.preventDefault()
+
+  keydown: (e) ->
+    @suppressKeyPressRepeat = ~$.inArray(e.keyCode, [40,38,9,13,27])
+    @move(e)
+
+  keypress: (e) ->
+    return if @suppressKeyPressRepeat
+    @move(e)
+
+  keyup: (e) ->
 
     switch e.keyCode
       when 40, 38 # down / up arrow
         break
-      when 9, 13 # tab / enter
+      when 9 # tab
+        return if !@shown
+        @select()
+      when 13 # enter
         if !@shown
           @onenter() if typeof @onenter == "function"
-          @add_new() if @allowNew
-          return false
+          @select() if @allowNew
         else
           @select()
         break
       when 27 # escape
+        return if !@shown
         @hide()
         break
       else
         @lookup()
 
-  keypress: (e) ->
     e.stopPropagation()
-    # if !@shown
-    #   return
+    e.preventDefault()
 
-    switch e.keyCode
-      when 9, 13, 27 # tab / enter / escape
-        e.preventDefault()
-        break
-      when 38 # up arrow
-        e.preventDefault()
-        @prev()
-        break
-      when 40 # down arrow
-        e.preventDefault()
-        @next()
-        break
+  focus: (e) ->
+    @focused = true
 
   blur: (e) ->
+    @focused = false
     that = @
     e.stopPropagation()
     e.preventDefault()
@@ -286,10 +324,16 @@ AutocompleteCollection.prototype =
     e.stopPropagation()
     e.preventDefault()
     @select(true)
+    @$element.focus()
 
   mouseenter: (e) ->
+    @mousedover = true
     @$menu.find('.active').removeClass('active')
     $(e.currentTarget).addClass('active')
+
+  mouseleave: (e) ->
+    @mousedover = false
+    @hide() if !@focused and @shown
 
 
 $.fn.autocomplete_collection = (option) ->
@@ -303,7 +347,7 @@ $.fn.autocomplete_collection = (option) ->
       data[option]()
 
 $.fn.autocomplete_collection.defaults =
-  collection_ui: '<ul class="autocomplete-collection"></ul>'
+  collectionUi: '<ul class="autocomplete-collection"></ul>'
   items: 8
   menu: '<ul class="autocomplete_collection dropdown-menu"></ul>'
   item: '<li><a href="#"></a></li>'
