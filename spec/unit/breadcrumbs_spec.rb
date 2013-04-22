@@ -1,4 +1,4 @@
-require 'spec_helper' 
+require 'spec_helper'
 
 describe "Breadcrumbs" do
 
@@ -10,6 +10,12 @@ describe "Breadcrumbs" do
     def params; {}; end
     # Mock link to and return a hash
     def link_to(name, url); {:name => name, :path => url}; end
+
+    let :active_admin_config do
+      m = mock
+      m.stub_chain(:belongs_to_config, :target, :resource_class).and_return Post
+      m
+    end
 
     let(:trail) { breadcrumb_links(path) }
 
@@ -73,7 +79,7 @@ describe "Breadcrumbs" do
 
       context "when Post.find(1) does exist" do
         before do
-          Post.stub!(:find).and_return{ mock(:display_name => "Hello World") }
+          Post.stub!(:find_by_id).and_return{ mock(:display_name => "Hello World") }
         end
         it "should have a link to /admin/posts/1 using display name" do
           trail[2][:name].should == "Hello World"
@@ -106,7 +112,7 @@ describe "Breadcrumbs" do
 
       context "when Post.find(4e24d6249ccf967313000000) does exist" do
         before do
-          Post.stub!(:find).with('4e24d6249ccf967313000000').and_return{ mock(:display_name => "Hello World") }
+          Post.stub!(:find_by_id).with('4e24d6249ccf967313000000').and_return{ mock(:display_name => "Hello World") }
         end
         it "should have a link to /admin/posts/4e24d6249ccf967313000000 using display name" do
           trail[2][:name].should == "Hello World"

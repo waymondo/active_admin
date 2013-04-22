@@ -14,16 +14,7 @@ module ActiveAdmin
       # @return [Array] Filters that apply for this resource
       def filters
         return [] unless filters_enabled?
-
-        if @filters.present?
-          if preserve_default_filters?
-            @filters + default_filters
-          else
-            @filters
-          end
-        else
-          default_filters
-        end
+        filter_lookup
       end
 
       # Setter to enable / disable filters on this resource.
@@ -55,9 +46,8 @@ module ActiveAdmin
           raise RuntimeError, "Can't remove a filter when filters are disabled. Enable filters with 'config.filters = true'"
         end
 
-        @filters ||= default_filters
-
-        @filters.delete_if { |f| f.fetch(:attribute) == attribute }
+        @filters_to_remove ||= []
+        @filters_to_remove << attribute
       end
 
       # Add a filter for this resource. If filters are not enabled, this method
@@ -72,18 +62,33 @@ module ActiveAdmin
         end
 
         @filters ||= []
-
         @filters << options.merge({ :attribute => attribute })
       end
 
       # Reset the filters to use defaults
       def reset_filters!
         @filters = nil
+        @filters_to_remove = nil
       end
 
       private
 
-      # @return [Array] The array of default for filters for this resource
+      # Collapses the waveform, if you will, of which filters should be displayed.
+      # Removes filters and adds in default filters as desired.
+      def filter_lookup
+        filters = @filters.try(:dup) || []
+        filters.push *default_filters if filters.empty? || preserve_default_filters?
+
+        if @filters_to_remove
+          @filters_to_remove.each do |attr|
+            filters.delete_if{ |f| f.fetch(:attribute) == attr }
+          end
+        end
+
+        filters
+      end
+
+      # @return [Array] The array of default filters for this resource
       def default_filters
         default_association_filters + default_content_filters
       end

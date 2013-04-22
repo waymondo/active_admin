@@ -21,6 +21,7 @@ de:
     download: "Herunterladen:"
     has_many_new: "%{model} hinzufügen"
     has_many_delete: "Löschen"
+    has_many_remove: "Entfernen"
     filter: "Filtern"
     clear_filters: "Filter entfernen"
     search_field: "Durchsuche %{field}"
@@ -79,14 +80,15 @@ de:
       links:
         sign_in: "Anmeldung"
         forgot_your_password: "Passwort vergessen?"
+        sign_in_with_omniauth_provider: "Anmeldung mit %{provider}"
   activerecord:
     attributes:
       admin_user:
         id: ID
         email: E-Mail
         encrypted_Password: Verschlüsseltes Passwort
-        reset_password_token: Passwort Reset Token
-        reset_password_sent_at: Passwort Reset Anweisungen gesendet am
+        reset_password_token: Passwort-Reset-Token
+        reset_password_sent_at: Passwort-Reset-Anweisungen gesendet am
         remember_created_at: Passwort merken seit
         sign_in_count: Anzahl Logins
         current_sign_in_at: Aktuell angemeldet seit

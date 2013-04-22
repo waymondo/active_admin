@@ -21,6 +21,7 @@ hr:
     download: "Spremi na računalo:"
     has_many_new: "Dodaj novi %{model}"
     has_many_delete: "Obriši"
+    has_many_remove: "Ukloniti"
     filter: "Filtriraj"
     clear_filters: "Očisti filtere"
     search_field: "Pretraži po %{field}"
@@ -83,3 +84,4 @@ hr:
       links:
         sign_in: "Prijavi se"
         forgot_your_password: "Zaboravljena lozinka?"
+        sign_in_with_omniauth_provider: "Prijavite se za %{provider}"

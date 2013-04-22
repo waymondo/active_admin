@@ -19,6 +19,7 @@
     download: "Last ned:"
     has_many_new: "Legg til ny %{model}"
     has_many_delete: "Slett"
+    has_many_remove: "Fjern"
     filter: "Filter"
     clear_filters: "Fjern filter"
     search_field: "Søk %{field}"
@@ -74,4 +75,5 @@
       links:
         sign_in: "Logg inn"
         forgot_your_password: "Glemt passord?"
+        sign_in_with_omniauth_provider: "Logg på med %{provider}"
 

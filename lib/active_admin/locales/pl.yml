@@ -21,6 +21,7 @@ pl:
     download: "Pobierz:"
     has_many_new: "Dodaj nowy %{model}"
     has_many_delete: "Usuń"
+    has_many_remove: "Usuń"
     filter: "Filtruj"
     clear_filters: "Wyczyść Filtry"
     search_field: "Szukaj %{field}"
@@ -78,6 +79,7 @@ pl:
       links:
         sign_in: "Zaloguj się"
         forgot_your_password: "Nie pamiętasz hasła?"
+        sign_in_with_omniauth_provider: "Zaloguj się z %{provider}"
   formtastic:
     actions:
       update: "Aktualizuj %{model}"

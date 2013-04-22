@@ -21,6 +21,7 @@ tr:
     download: "İndir:"
     has_many_new: "Yeni %{model} kaydı ekle"
     has_many_delete: "Sil"
+    has_many_remove: "Çıkarmak"
     filter: "Filtrele"
     clear_filters: "Filtreleri Temizle"
     search_field: "%{field} alanında ara"
@@ -79,3 +80,5 @@ tr:
       links:
         sign_in: "Oturum aç"
         forgot_your_password: "Şifreni mi unuttun?"
+        sign_in_with_omniauth_provider: "%{provider} ile giriş yapın"
+

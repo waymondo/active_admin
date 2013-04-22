@@ -1,30 +1,135 @@
-## Master (unreleased)
+## Master (unreleased) - [compare](https://github.com/gregbell/active_admin/compare/v0.6.0...master)
+
+### Features
+
+* OmniAuth provider links now automatically appear on the login page [#2088][] by [@henrrrik][]
+* Menu items can now properly overflow [#2046][] by [@maax][]; later updated in [#2125][] by [@ball-hayden][]
+
+### Bug Fixes
+
+* Fixes problem where extra `/` route was being generated [#2062][] by [@jbhannah][]
+* `IndexAsBlog` now renders title/body procs in the view context [#2087][] by [@macfanatic][]
+* Fixes `route_instance_path` for `belongs_to` resources [#2099][] by [@pcreux][]
+* Fixes breadcrumb links for `belongs_to` resources [#2090][] by [@Daxter][]
+* Forces a `I18n.reload!` to ensure translations are loaded in production [#2072][] [@ericpromislow][]
+
+### Enhancements
+
+* Adds option to "undecorate" resource when building forms [#2085][] by [@amiel][]
+* Adds [better_errors](https://github.com/charliesome/better_errors) gem for a better AA development experience [#2095][] by [@Daxter][]
+* Scopes now support blocks for the `:default` option [#2084][] by [@macfanatic][]
+* `:if` and `:unless` options added to `scope_to` [#2089][] by [@macfanatic][]
+* German (Switzerland), English (UK) locales added [#1916][] by [@psy-q][]
+* Renames Comment to AdminComment [#2060][] by [@jbhannah][]; later replaced by [#2113][]
+* Improves Comments UI and adds config settings [#2113][] by [@Daxter][]
+```ruby
+    config.show_comments_in_menu      = false          # Defaults to true
+    config.comments_registration_name = 'AdminComment' # Defaults to 'Comment'
+```
+
+* `has_many` forms
+  * Adds 'has_many_delete' CSS class to `li` elements [#2054][] by [@shekibobo][]
+  * Adds `:heading` option to customize the heading displayed [#2068][] by [@coreyward][]
+  * Adds `:allow_destroy` option to add in a checkbox to the form to delete records [#2071][] by [@shekibobo][]
+
+### Cleanup
+
+* Cucumber step definitions refactor [#2015][] by [@Daxter][]
+* Misc cleanup in [#2075][] and [#2107][] by [@Daxter][]
+* Removes messy spacing from `AdminUser` generator file [#2058][] by [@lupinglade][]
+* Fixes documentation formatting [#2083][] by [@amiel][]
+
+## 0.6.0 - [compare](https://github.com/gregbell/active_admin/compare/v0.5.1...v0.6.0)
+
+### Bug Fixes
 
 * Fix conflict with Redcloth [#1805][] by [@adrienkohlbecker][]
 * Add missing batch actions translations. [#1788][] by [@EtienneDepaulis][]
-* New "actions" DSL for customizing actions on index listing [#1834][] by [@ejholmes][]
-* Updated documentation for formtastic deprecated f.buttons [#1867][] by [@ericcumbee][]
+* JS fix for batch actions checkbox toggling [#1947][] by [@ai][]
+* Fixed routing bug for root namespace [#2043][] by [@Daxter][] and [@gregbell][]
+
+### Enhancements
+
 * Rubinis compatability change over block variables [#1871][] by [@dbussin][]
-* Authorization DSL including a default CanCan adapter [#1817][] by [@pcreux][]
-* Fix for [#1960][], pluralize the example admin_users model to be consistent [#1961][] by [@rmw][]
 * Compatability with Draper 1.0 release [#1896][] by [@hakanensari][]
 * Fixed references to "dashboards.rb" in locales, since file doesn't exist [#1873][] by [@ryansch][]
 * Removing deprecated bourbon box-shadow mixin [#1913][] by [@stereoscott][]
 * More Japanese localizations [#1929][] by [@johnnyshields][]
 * Devise lockable module now supported by default [#1933][] by [@Bishop][]
-* Index title can now be set via a proc [#1861][] by [@jamesalmond][]
-* Copyright updated for 2013 [#1937][] by [@snapapps][]
-* JS fix for batch actions checkbox toggling [#1947][] by [@ai][]
-* Can now disable download_links per resource, index collection or globally throughout AA [#1908][] by [@TBAA][]
-* IndexTableFor component now returns a unique DOM id, ie "index_table_posts" instead of just "posts" [#1966][] by [@TiagoCardoso1983][]
+* Index table now uses a unique DOM id (`#index_table_posts` instead of `#posts`) [#1966][] by [@TiagoCardoso1983][]
 * Coffeescript 1.5 compatability as constructors no longer return a value [#1940][] by [@ronen][]
-* Filters: add ability to search for blank/null fields with boolean search [#1893][] by [@whatcould][]
-* Allow options to be passed to the Abre element for rows in attributes_table [#1439][] by [@Daxter][]
-* New `navigation_menu` DSL for menu system [#1967][] by [@macfanatic][] and [@gregbell][]
+* Allow options to be passed to the Abre element for rows in `attributes_table` [#1439][] by [@Daxter][]
 * Gender neutral Spanish translations [#1973][] by [@laffinkippah][]
-* Adds the ability to use starts_with and ends_with in string filters [#1962][] by [@rmw][]
+* Adds the ability to use `starts_with` and `ends_with` in string filters [#1962][] by [@rmw][]
+* Adds support for translating resources when registered with `:as` [#2044][] by [@Daxter][]
+* Scopes are no longer hidden when empty filter results [#1804][] by [@Daxter][]
+* Dynamic scope names with procs [#2018][] by [@Daxter][]
+* Filters now support the `:if` optional argument [#1801][] by [@Daxter][]
+* Member & collection actions support multiple HTTP methods for the same action [#2000][] by [@rdsoze][]
 
-## 0.5.1
+### Features
+
+* Authorization DSL including a default CanCan adapter [#1817][] by [@pcreux][] and [@gregbell][]
+* New "actions" DSL for customizing actions on index listing [#1834][] by [@ejholmes][]
+* Index title can now be set via a proc [#1861][] by [@jamesalmond][]
+* Can now disable `download_links` per resource, index collection or globally throughout AA [#1908][] by [@TBAA][]
+* Filters: add ability to search for blank/null fields with boolean search [#1893][] by [@whatcould][]
+* New `navigation_menu` DSL for menu system [#1967][] by [@macfanatic][] and [@gregbell][]
+* Support segmented control switch between different index styles [#1745][] by [@joshuacollins85][]
+
+### Other
+
+* Updated documentation for formtastic deprecated f.buttons [#1867][] by [@ericcumbee][]
+* Copyright updated for 2013 [#1937][] by [@snapapps][]
+
+### Contributors
+
+327 Commits by 42 authors
+
+*  Adrien Kohlbecker
+*  Alexandr Prudnikov
+*  Andrew Pietsch
+*  Andrey A.I. Sitnik
+*  Andrey Rozhkovsky
+*  Anthony Zacharakis
+*  Bartlomiej Niemtur
+*  David DIDIER
+*  David Reese
+*  Daxter
+*  Dirkjan Bussink
+*  Dominik Masur
+*  Eric Cumbee
+*  Eric J. Holmes
+*  Etienne Depaulis
+*  Gosha Arinich
+*  Greg Bell
+*  Ian Carroll
+*  James Almond
+*  Johnny Shields
+*  Joshua Collins
+*  Kieran Klaassen
+*  Luís Ramalho
+*  Matt Brewer
+*  Nathaniel Bibler
+*  Olek Janiszewski
+*  Philippe Creux
+*  Raison Dsouza
+*  Rebecca Miller-Webster
+*  Roman Sklenar
+*  Roman Sklenář
+*  Ryan Schlesinger
+*  Scott Meves
+*  Sean Ian Linsley
+*  Sergey Pchelincev
+*  Simon Menke
+*  Tiago Cardoso
+*  Travis Pew
+*  WU Jun
+*  laffinkippah
+*  ronen barzel
+*  тιηуηυмвєяѕ
+
+## 0.5.1 - [compare](https://github.com/gregbell/active_admin/compare/v0.5.0...v0.5.1)
 
 ### Enhancements
 
@@ -86,7 +191,7 @@ application locales. [#1775][] by [@caifara][]
 
 156 commits (49 Pull Requests) by 51 contributors.
 
-## 0.5.0
+## 0.5.0 - [compare](https://github.com/gregbell/active_admin/compare/v0.4.4...v0.5.0)
 
 ### Enhancements
 
@@ -120,20 +225,20 @@ application locales. [#1775][] by [@caifara][]
 
 561 commits (142 Pull Requests) by 88 contributors.
 
-## 0.4.4
+## 0.4.4 - [compare](https://github.com/gregbell/active_admin/compare/v0.4.3...v0.4.4)
 
 ### Dependencies
 
 * Use `formtastic` ~> 2.1.1 until AA 0.5.0 is released
 * Use `inherited_resources` >= 1.3.1 (ensure flash messages work)
 
-## 0.4.3
+## 0.4.3 - [compare](https://github.com/gregbell/active_admin/compare/v0.4.2...v0.4.3)
 
 ### Bug Fixes
 
 * [#1063][]: Fix comment issues when using postgres ([@jancel][])
 
-## 0.4.2
+## 0.4.2 - [compare](https://github.com/gregbell/active_admin/compare/v0.4.1...v0.4.2)
 
 ### Enhancements
 
@@ -171,7 +276,7 @@ application locales. [#1775][] by [@caifara][]
 * Philippe Creux
 
 
-## 0.4.1
+## 0.4.1 - [compare](https://github.com/gregbell/active_admin/compare/v0.4.0...v0.4.1)
 
 ### Enhancements
 
@@ -215,11 +320,11 @@ application locales. [#1775][] by [@caifara][]
 * Søren Houen
 
 
-## 0.4.0
+## 0.4.0 - [compare](https://github.com/gregbell/active_admin/compare/v0.3.4...v0.4.0)
 
 ### Upgrade Notes
 
-If you're running on Rails 3.0.x, make sure to run `rails generate active_admin:assets` 
+If you're running on Rails 3.0.x, make sure to run `rails generate active_admin:assets`
 since we've changed both the CSS and JS files.
 
 ### Deprecations
@@ -242,7 +347,7 @@ since we've changed both the CSS and JS files.
 ### Enhancements
 
 * [#428][]: Paginated Collection now supports `:param_name` and `:download_links`.
-  These two additions allow you to use the `paginated_collection` component multiple 
+  These two additions allow you to use the `paginated_collection` component multiple
   times on show screens. ([@samvincent][])
 * [#527][]: Refactored all form helpers to use Formtastic 2([@ebeigarts][])
 * [#551][]: Dashboards can now be conditionally displayed using `:if` ([@samvincent][])
@@ -254,7 +359,7 @@ since we've changed both the CSS and JS files.
 * [#638][]: Add `:label` option to `status_tag` component ([@fbuenemann][])
 * [#644][]: Added proper I18n support to pagination ([@fbuenemann][])
 * [#689][]: Scopes preserve title when provided as a string ([@macfanatic][])
-* [#711][]: Styles update. Now sexier and more refined design. Redesigned Scopes. Split 
+* [#711][]: Styles update. Now sexier and more refined design. Redesigned Scopes. Split
   css into smaller files. ([@mattvague][])
 * [#741][]: Default media type of css is now "all" instead of "screen" ([@sftsang][])
 * [#751][]: Pagination numbers work with a custom `[@per_page][]` ([@DMajrekar][])
@@ -273,8 +378,8 @@ since we've changed both the CSS and JS files.
 
 ### Dependencies
 
-* [#468][]: Removed vendored jQuery. Now depends on the jquery-rails gem. If you're 
-  running Rails 3.0.x (no asset pipeline), make sure to run 
+* [#468][]: Removed vendored jQuery. Now depends on the jquery-rails gem. If you're
+  running Rails 3.0.x (no asset pipeline), make sure to run
   `rails generate active_admin:assets` to generate the correct files. ([@gregbell][])
 * [#527][]: Active Admin now requires Formtastic 2.0 or greater ([@ebeigarts][])
 * [#711][]: Active admin now depends on Bourbon > 1.0.0. If you're using Rails
@@ -333,7 +438,7 @@ since we've changed both the CSS and JS files.
  * Josef Šimánek
 
 
-## 0.3.4
+## 0.3.4 - [compare](https://github.com/gregbell/active_admin/compare/v0.3.4...v0.4.0)
 
 2 commits by 2 authors
 
@@ -349,7 +454,7 @@ since we've changed both the CSS and JS files.
 * Danny Hiemstra
 * Greg Bell
 
-## 0.3.3
+## 0.3.3 - [compare](https://github.com/gregbell/active_admin/compare/v0.3.2...v0.3.3)
 
 1 commit by 1 author
 
@@ -363,7 +468,7 @@ since we've changed both the CSS and JS files.
 
 * Greg Bell
 
-## 0.3.2
+## 0.3.2 - [compare](https://github.com/gregbell/active_admin/compare/v0.3.1...v0.3.2)
 
 45 commits by 15 contributors
 
@@ -408,11 +513,11 @@ since we've changed both the CSS and JS files.
 * Tsvetan Roustchev
 * l4u
 
-## 0.3.1
+## 0.3.1 - [compare](https://github.com/gregbell/active_admin/compare/v0.3.0...v0.3.1)
 
 * Only support InheritedResources up to 1.2.2
 
-## 0.3.0
+## 0.3.0 - [compare](https://github.com/gregbell/active_admin/compare/v0.2.2...v0.3.0)
 
 326 commits by 35 contributors
 
@@ -509,7 +614,7 @@ since we've changed both the CSS and JS files.
 * Łukasz Anwajler
 
 
-## 0.2.2 (2011-05-26)
+## 0.2.2 (2011-05-26) - [compare](https://github.com/gregbell/active_admin/compare/v0.2.1...v0.2.2)
 
 68 Commits by 13 Contributors
 
@@ -555,12 +660,12 @@ since we've changed both the CSS and JS files.
 * Paul Annesley
 * Philippe Creux
 
-## 0.2.1 (2011-05-12)
+## 0.2.1 (2011-05-12) - [compare](https://github.com/gregbell/active_admin/compare/v0.2.0...v0.2.1)
 
 ### Bug Fixes
 * Fixed issue with dashboard rendering a sidebar
 
-## 0.2.0 (2011-05-12)
+## 0.2.0 (2011-05-12) - [compare](https://github.com/gregbell/active_admin/compare/v0.1.1...v0.2.0)
 
 0.2.0 is essentially an entire re-write of Active Admin. Here are some
 of the highlights. 250 commits. Enough said.
@@ -576,7 +681,7 @@ of the highlights. 250 commits. Enough said.
 
 * Too many to list! Been in production for close to a year
 
-## 0.1.1 (2010-09-15)
+## 0.1.1 (2010-09-15) - [compare](https://github.com/gregbell/active_admin/compare/v0.1.0...v0.1.1)
 
 ### Bug Fixes
 
@@ -668,6 +773,7 @@ of the highlights. 250 commits. Enough said.
 [#1041]: https://github.com/gregbell/active_admin/issues/1041
 [#1063]: https://github.com/gregbell/active_admin/issues/1063
 [#1117]: https://github.com/gregbell/active_admin/issues/1117
+[#1439]: https://github.com/gregbell/active_admin/issues/1439
 [#1609]: https://github.com/gregbell/active_admin/issues/1609
 [#1626]: https://github.com/gregbell/active_admin/issues/1626
 [#1647]: https://github.com/gregbell/active_admin/issues/1647
@@ -676,40 +782,81 @@ of the highlights. 250 commits. Enough said.
 [#1681]: https://github.com/gregbell/active_admin/issues/1681
 [#1683]: https://github.com/gregbell/active_admin/issues/1683
 [#1699]: https://github.com/gregbell/active_admin/issues/1699
+[#1745]: https://github.com/gregbell/active_admin/issues/1745
 [#1752]: https://github.com/gregbell/active_admin/issues/1752
 [#1775]: https://github.com/gregbell/active_admin/issues/1775
 [#1782]: https://github.com/gregbell/active_admin/issues/1782
 [#1783]: https://github.com/gregbell/active_admin/issues/1783
 [#1788]: https://github.com/gregbell/active_admin/issues/1788
+[#1801]: https://github.com/gregbell/active_admin/issues/1801
+[#1804]: https://github.com/gregbell/active_admin/issues/1804
 [#1805]: https://github.com/gregbell/active_admin/issues/1805
+[#1817]: https://github.com/gregbell/active_admin/issues/1817
+[#1834]: https://github.com/gregbell/active_admin/issues/1834
+[#1861]: https://github.com/gregbell/active_admin/issues/1861
+[#1867]: https://github.com/gregbell/active_admin/issues/1867
+[#1871]: https://github.com/gregbell/active_admin/issues/1871
+[#1873]: https://github.com/gregbell/active_admin/issues/1873
+[#1893]: https://github.com/gregbell/active_admin/issues/1893
+[#1896]: https://github.com/gregbell/active_admin/issues/1896
+[#1908]: https://github.com/gregbell/active_admin/issues/1908
+[#1913]: https://github.com/gregbell/active_admin/issues/1913
+[#1929]: https://github.com/gregbell/active_admin/issues/1929
+[#1933]: https://github.com/gregbell/active_admin/issues/1933
+[#1937]: https://github.com/gregbell/active_admin/issues/1937
+[#1940]: https://github.com/gregbell/active_admin/issues/1940
+[#1947]: https://github.com/gregbell/active_admin/issues/1947
+[#1960]: https://github.com/gregbell/active_admin/issues/1960
+[#1961]: https://github.com/gregbell/active_admin/issues/1961
+[#1962]: https://github.com/gregbell/active_admin/issues/1962
+[#1966]: https://github.com/gregbell/active_admin/issues/1966
+[#1967]: https://github.com/gregbell/active_admin/issues/1967
+[#1973]: https://github.com/gregbell/active_admin/issues/1973
+[#2000]: https://github.com/gregbell/active_admin/issues/2000
+[#2018]: https://github.com/gregbell/active_admin/issues/2018
+[#2043]: https://github.com/gregbell/active_admin/issues/2043
+[#2044]: https://github.com/gregbell/active_admin/issues/2044
+[@Bishop]: https://github.com/Bishop
 [@BoboFraggins]: https://github.com/BoboFraggins
 [@DMajrekar]: https://github.com/DMajrekar
+[@Daxter]: https://github.com/Daxter
 [@EtienneDepaulis]: https://github.com/EtienneDepaulis
 [@MoritzMoritz]: https://github.com/MoritzMoritz
+[@TBAA]: https://github.com/TBAA
+[@TiagoCardoso1983]: https://github.com/TiagoCardoso1983
 [@ZequeZ]: https://github.com/ZequeZ
 [@adrienkohlbecker]: https://github.com/adrienkohlbecker
+[@ai]: https://github.com/ai
 [@amiel]: https://github.com/amiel
 [@bobbytables]: https://github.com/bobbytables
 [@caifara]: https://github.com/caifara
 [@comboy]: https://github.com/comboy
 [@dapi]: https://github.com/dapi
+[@dbussin]: https://github.com/dbussin
 [@dhiemstra]: https://github.com/dhiemstra
 [@doug316]: https://github.com/doug316
 [@ebeigarts]: https://github.com/ebeigarts
+[@ejholmes]: https://github.com/ejholmes
 [@emzeq]: https://github.com/emzeq
+[@ericcumbee]: https://github.com/ericcumbee
 [@fabiokr]: https://github.com/fabiokr
 [@fabiormoura]: https://github.com/fabiormoura
 [@fbuenemann]: https://github.com/fbuenemann
 [@george]: https://github.com/george
 [@ggilder]: https://github.com/ggilder
 [@gregbell]: https://github.com/gregbell
+[@hakanensari]: https://github.com/hakanensari
 [@j]: https://github.com/j
+[@jamesalmond]: https://github.com/jamesalmond
 [@jancel]: https://github.com/jancel
 [@jbarket]: https://github.com/jbarket
+[@johnnyshields]: https://github.com/johnnyshields
+[@joshuacollins85]: https://github.com/joshuacollins85
 [@jschwindt]: https://github.com/jschwindt
 [@kerberoS]: https://github.com/kerberoS
 [@knoopx]: https://github.com/knoopx
 [@krug]: https://github.com/krug
+[@laffinkippah]: https://github.com/laffinkippah
 [@latortuga]: https://github.com/latortuga
 [@macfanatic]: https://github.com/macfanatic
 [@mattvague]: https://github.com/mattvague
@@ -721,19 +868,27 @@ of the highlights. 250 commits. Enough said.
 [@per_page]: https://github.com/per_page
 [@ptn]: https://github.com/ptn
 [@randym]: https://github.com/randym
+[@rdsoze]: https://github.com/rdsoze
 [@rheaton]: https://github.com/rheaton
+[@rmw]: https://github.com/rmw
 [@robdiciuccio]: https://github.com/robdiciuccio
 [@rolfb]: https://github.com/rolfb
+[@ronen]: https://github.com/ronen
+[@ryansch]: https://github.com/ryansch
 [@samvincent]: https://github.com/samvincent
 [@sftsang]: https://github.com/sftsang
 [@shayfrendt]: https://github.com/shayfrendt
 [@shell]: https://github.com/shell
 [@simonoff]: https://github.com/simonoff
+[@snapapps]: https://github.com/snapapps
+[@stereoscott]: https://github.com/stereoscott
 [@sunny]: https://github.com/sunny
 [@tracedwax]: https://github.com/tracedwax
 [@tricknotes]: https://github.com/tricknotes
 [@utkarshkukreti]: https://github.com/utkarshkukreti
 [@vairix]: https://github.com/vairix
+[@vairix-ssierra]: https://github.com/vairix-ssierra
 [@watson]: https://github.com/watson
+[@whatcould]: https://github.com/whatcould
 [@yawn]: https://github.com/yawn
 [@yorch]: https://github.com/yorch

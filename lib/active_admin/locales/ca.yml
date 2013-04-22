@@ -20,6 +20,7 @@ ca:
     download: "Descarregar:"
     has_many_new: "Afegir %{model}"
     has_many_delete: "Eliminar"
+    has_many_remove: "Treure"
     filter: "Filtrar"
     clear_filters: "Treure filtres"
     search_field: "Cercar %{field}"
@@ -78,4 +79,5 @@ ca:
       links:
         sign_in: "Registrar"
         forgot_your_password: "Heu perdut la contrasenya?"
+        sign_in_with_omniauth_provider: "Connecta't amb %{provider}"
 

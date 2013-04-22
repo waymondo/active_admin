@@ -21,6 +21,7 @@ fr:
     download: "Télécharger:"
     has_many_new: "Ajouter un nouveau %{model}"
     has_many_delete: "Supprimer"
+    has_many_remove: "Enlever"
     filter: "Filtrer"
     clear_filters: "Supprimer les filtres"
     search_field: "Rechercher %{field}"
@@ -79,3 +80,4 @@ fr:
       links:
         sign_in: "Connectez-vous"
         forgot_your_password: "Vous avez oublié votre mot de passe?"
+        sign_in_with_omniauth_provider: "Connectez-vous avec %{provider}"

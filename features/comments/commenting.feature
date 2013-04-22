@@ -34,7 +34,7 @@ Feature: Commenting
         config.comments = false
       end
     """
-    Then I should not see "Comments"
+    Then I should not see the element "div.comments.panel"
 
   Scenario: View a resource in a namespace that doesn't have comments
     Given a configuration of:

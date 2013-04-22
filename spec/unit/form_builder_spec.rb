@@ -335,7 +335,7 @@ describe ActiveAdmin::FormBuilder do
       end
 
       it "should add a link to remove new nested records" do
-        Capybara.string(body).should have_css(".has_many > fieldset > ol > li > a", :class => "button", :href => "#", :content => "Delete")
+        Capybara.string(body).should have_css(".has_many > fieldset > ol > li.has_many_delete > a", :class => "button", :href => "#", :content => "Delete")
       end
 
       it "should include the nested record's class name in the js" do
@@ -359,6 +359,50 @@ describe ActiveAdmin::FormBuilder do
 
       it "should accept a block with a second argument" do
         body.should have_tag("label", "Title 1")
+      end
+    end
+
+    describe "with allow destroy" do
+      context "with an existing post" do
+        let :body do
+          build_form({:url => '/categories'}, Category.new) do |f|
+            f.object.posts.build.stub!(:new_record? => false)
+            f.has_many :posts, :allow_destroy => true do |p|
+              p.input :title
+            end
+          end
+        end
+
+        it "should include a boolean field for _destroy" do
+          body.should have_tag("input", :attributes => {:name => "category[posts_attributes][0][_destroy]"})
+        end
+
+        it "should have a check box with 'Remove' as its label" do
+          body.should have_tag("label", :attributes => {:for => "category_posts_attributes_0__destroy"}, :content => "Remove")
+        end
+
+        it "should wrap the destroy field in an li with class 'has_many_remove'" do
+          Capybara.string(body).should have_css(".has_many > fieldset > ol > li.has_many_remove > input")
+        end
+      end
+
+      context "with a new post" do
+        let :body do
+          build_form({:url => '/categories'}, Category.new) do |f|
+            f.object.posts.build
+            f.has_many :posts, :allow_destroy => true do |p|
+              p.input :title
+            end
+          end
+        end
+
+        it "should not have a boolean field for _destroy" do
+          body.should_not have_tag("input", :attributes => {:name => "category[posts_attributes][0][_destroy]"})
+        end
+
+        it "should not have a check box with 'Remove' as its label" do
+          body.should_not have_tag("label", :attributes => {:for => "category_posts_attributes_0__destroy"}, :content => "Remove")
+        end
       end
     end
 
@@ -405,6 +449,21 @@ describe ActiveAdmin::FormBuilder do
       body.should have_tag("input", :attributes => {  :type => "text",
                                                           :class => "datepicker",
                                                           :name => "post[created_at]" })
+    end
+  end
+
+  describe "inputs block with nil return value" do
+    let :body do
+      build_form do |f|
+        f.inputs do
+          f.input :title
+          nil
+        end
+      end
+    end
+
+    it "should generate a single input field" do
+      body.should have_tag("input", :attributes => { :type => "text", :name => "post[title]" })
     end
   end
 

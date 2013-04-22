@@ -59,21 +59,6 @@ instead of a string. The proc will be called each time the menu is rendered.
       menu :label => proc{ I18n.t("mypost") }
     end
 
-### Drop Down Menus
-
-In many cases, a single level navigation will not be enough for the
-administration of a production application. In that case, you can categorize
-your resources and creating drop down menus to access them.
-
-To add the menu as a child of another menu:
-
-    ActiveAdmin.register Post do
-      menu :parent => "Blog"
-    end
-
-Note, the "Blog" menu does not even have to exist yet. It will be generated on
-the fly as a drop down list for you.
-
 ### Menu Priority
 
 By default Active Admin sorts menus alphabetically. Some times you want specific
@@ -98,6 +83,42 @@ Menu items can be shown or hidden at runtime using the `:if` option.
 
 The `proc` will be called in the context of the view, so you have access to all
 your helpers and current user session information.
+
+### Drop Down Menus
+
+In many cases, a single level navigation will not be enough for the
+administration of a production application. In that case, you can categorize
+your resources and creating drop down menus to access them.
+
+To add the menu as a child of another menu:
+
+    ActiveAdmin.register Post do
+      menu :parent => "Blog"
+    end
+
+Note, the "Blog" menu does not even have to exist yet. It will be generated on
+the fly as a drop down list for you.
+
+### Customizing Parent Menu Items
+
+All of the options given to a standard menu item are also available to the
+parent menu items. You can customize their attributes in the Active Admin
+initializer.
+
+    # config/initializers/active_admin.rb
+    ActiveAdmin.setup do |config|
+      config.namespace :admin do |admin|
+
+        # This block will edit the default menu
+        admin.build_menu do |menu|
+          menu.add :label => "Blog", :priority => 0
+        end
+
+      end
+    end
+
+Now, if you use `menu :parent => "Blog"`, your resource menu item will be a
+child of the Blog menu item with the priority of 0.
 
 ### Adding Custom Menu Items
 
@@ -136,6 +157,21 @@ has_many relationships, you can simply scope the listings and finders like so:
     end
 
 That approach limits the posts an admin can access to ```current_user.posts```.
+
+If you want to conditionally apply the scope, then there are options for that as well:
+
+    ActiveAdmin.register Post do
+      # Only scope the query if there is a user to scope to, helper provided via Devise
+      scope_to :current_user, :if => proc{ admin_user_signed_in? }
+
+      # Don't scope the query if the user is an admin
+      scope_to :current_user, :unless => proc{ current_admin_user.admin? }
+
+      # Get fancy and can combine with block syntax
+      scope_to :if => proc{ admin_user_signed_in? } do
+        User.most_popular
+      end
+    end
 
 If you want to do something fancier, for example override a default scope, you can
 also use :association_method parameter with a normal method on your User model.

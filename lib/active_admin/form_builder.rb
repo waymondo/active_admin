@@ -9,37 +9,31 @@ module ActiveAdmin
     end
 
     def inputs(*args, &block)
-      # Store that we are creating inputs without a block
-      @inputs_with_block = block_given? ? true : false
-      content = with_new_form_buffer { super }
-      form_buffers.last << content.html_safe
+      @inputs_with_block = block_given?
+      form_buffers.last << with_new_form_buffer{ super }
     end
 
-    # The input method returns a properly formatted string for
-    # its contents, so we want to skip the internal buffering
-    # while building up its contents
+    # If this `input` call is inside a `inputs` block, add the content
+    # to the form buffer. Else, return it directly.
     def input(method, *args)
-      content = with_new_form_buffer { super }
-      return content.html_safe unless @inputs_with_block
-      form_buffers.last << content.html_safe
+      content = with_new_form_buffer{ super }
+      @inputs_with_block ? form_buffers.last << content : content
     end
 
-    def cancel_link(url = nil, html_options = {}, li_attributes = {})
-      li_attributes[:class] ||= "cancel"
-      url ||= {:action => "index"}
-      form_buffers.last << template.content_tag(:li, (template.link_to I18n.t('active_admin.cancel'), url, html_options), li_attributes)
+    def cancel_link(url = {:action => "index"}, html_options = {}, li_attrs = {})
+      li_attrs[:class] ||= "cancel"
+      li_content = template.link_to I18n.t('active_admin.cancel'), url, html_options
+      form_buffers.last << template.content_tag(:li, li_content, li_attrs)
     end
 
     def actions(*args, &block)
-      content = with_new_form_buffer do
-        block_given? ? super : super { commit_action_with_cancel_link }
+      form_buffers.last << with_new_form_buffer do
+        block_given? ? super : super{ commit_action_with_cancel_link }
       end
-      form_buffers.last << content.html_safe
     end
 
     def action(*args)
-      content = with_new_form_buffer { super }
-      form_buffers.last << content.html_safe
+      form_buffers.last << with_new_form_buffer{ super }
     end
 
     def commit_action_with_cancel_link
@@ -63,29 +57,36 @@ module ActiveAdmin
         end
 
         if has_many_form.object.new_record?
-          contents += template.content_tag(:li) do
+          contents += template.content_tag(:li, :class => 'has_many_delete') do
             template.link_to I18n.t('active_admin.has_many_delete'), "#", :onclick => "$(this).closest('.has_many_fields').remove(); return false;", :class => "button"
           end
+        elsif options[:allow_destroy]
+          has_many_form.input :_destroy, :as => :boolean, :wrapper_html => {:class => "has_many_remove"},
+                                                          :label => I18n.t('active_admin.has_many_remove')
+
         end
 
         contents
       end
 
-      content = with_new_form_buffer do
+      form_buffers.last << with_new_form_buffer do
         template.content_tag :div, :class => "has_many #{association}" do
-          form_buffers.last << template.content_tag(:h3, object.class.reflect_on_association(association).klass.model_name.human(:count => 1.1))
+          # Allow customization of the nested form heading
+          unless options.key?(:heading) && !options[:heading]
+            form_heading = options[:heading] ||
+              object.class.reflect_on_association(association).klass.model_name.human(:count => 1.1)
+            form_buffers.last << template.content_tag(:h3, form_heading)
+          end
+
           inputs options, &form_block
 
-          js = js_for_has_many(association, form_block, template)
-          form_buffers.last << js.html_safe
+          form_buffers.last << js_for_has_many(association, form_block, template)
         end
       end
-      form_buffers.last << content.html_safe
     end
 
     def semantic_errors(*args)
-      content = with_new_form_buffer { super }
-      form_buffers.last << content.html_safe unless content.nil?
+      form_buffers.last << with_new_form_buffer{ super }
     end
 
     # These methods are deprecated and removed from Formtastic, however are
@@ -160,36 +161,40 @@ module ActiveAdmin
       raise Formtastic::UnknownInputError
     end
 
+    # This method calls the block it's passed (in our case, the `f.inputs` block)
+    # and wraps the resulting HTML in a fieldset. If your block happens to return
+    # nil (but it otherwise built the form correctly), the below override passes
+    # the most recent part of the Active Admin form buffer.
+    def field_set_and_list_wrapping(*args, &block)
+      block_given? ? super{ yield || form_buffers.last } : super
+    end
+
     private
 
     def with_new_form_buffer
-      form_buffers << "".html_safe
-      return_value = yield
+      form_buffers << ''.html_safe
+      return_value = (yield || '').html_safe
       form_buffers.pop
       return_value
     end
 
     # Capture the ADD JS
     def js_for_has_many(association, form_block, template)
-      association_reflection = object.class.reflect_on_association(association)
-      association_human_name = association_reflection.klass.model_name.human
-      placeholder = "NEW_#{association_human_name.upcase.split(' ').join('_')}_RECORD"
+      assoc_reflection = object.class.reflect_on_association(association)
+      assoc_name       = assoc_reflection.klass.model_name
+      placeholder      = "NEW_#{assoc_name.upcase.split(' ').join('_')}_RECORD"
+      opts = {
+        :for         => [association, assoc_reflection.klass.new],
+        :class       => "inputs has_many_fields",
+        :for_options => { :child_index => placeholder }
+      }
+      js = with_new_form_buffer{ inputs_for_nested_attributes opts, &form_block }
+      js = template.escape_javascript js
 
-      js = with_new_form_buffer do
-        inputs_for_nested_attributes :for => [association, association_reflection.klass.new],
-                                     :class => "inputs has_many_fields",
-                                     :for_options => { :child_index => placeholder },
-                                     &form_block
-      end
-
-      js = template.escape_javascript(js)
-
-      text = I18n.t 'active_admin.has_many_new', :model => association_human_name
       onclick = "$(this).before('#{js}'.replace(/#{placeholder}/g, new Date().getTime())); return false;"
+      text    = I18n.t 'active_admin.has_many_new', :model => assoc_name.human
 
-      template.link_to text, "#",
-                       :onclick => onclick,
-                       :class => "button"
+      template.link_to(text, "#", :onclick => onclick, :class => "button").html_safe
     end
 
   end

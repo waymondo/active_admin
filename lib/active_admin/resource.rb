@@ -6,6 +6,7 @@ require 'active_admin/resource/pagination'
 require 'active_admin/resource/routes'
 require 'active_admin/resource/naming'
 require 'active_admin/resource/scopes'
+require 'active_admin/resource/scope_to'
 require 'active_admin/resource/sidebars'
 require 'active_admin/resource/belongs_to'
 
@@ -39,15 +40,9 @@ module ActiveAdmin
     # The default sort order to use in the controller
     attr_accessor :sort_order
 
-    # Scope this resource to an association in the controller
-    attr_accessor :scope_to
-
-    # If we're scoping resources, use this method on the parent to return the collection
-    attr_accessor :scope_to_association_method
-
     # Set the configuration for the CSV
     attr_writer :csv_builder
-    
+
     # Set breadcrumb builder
     attr_accessor :breadcrumb
 
@@ -68,6 +63,8 @@ module ActiveAdmin
       end
     end
 
+    include MethodOrProcHelper
+
     include Base
     include ActionItems
     include Authorization
@@ -77,6 +74,7 @@ module ActiveAdmin
     include PagePresenters
     include Pagination
     include Scopes
+    include ScopeTo
     include Sidebars
     include Menu
     include Routes
@@ -103,11 +101,6 @@ module ActiveAdmin
       resource_class.connection.quote_column_name(column)
     end
 
-    # Returns the named route for an instance of this resource
-    def route_instance_path
-      [route_prefix, controller.resources_configuration[:self][:route_instance_name], 'path'].compact.join('_').to_sym
-    end
-
     # Clears all the member actions this resource knows about
     def clear_member_actions!
       @member_actions = []
@@ -120,11 +113,6 @@ module ActiveAdmin
     # Return only defined resource actions
     def defined_actions
       controller.instance_methods.map { |m| m.to_sym } & ResourceController::ACTIVE_ADMIN_ACTIONS
-    end
-
-    # Are admin notes turned on for this resource
-    def admin_notes?
-      admin_notes.nil? ? ActiveAdmin.admin_notes : admin_notes
     end
 
     def belongs_to(target, options = {})

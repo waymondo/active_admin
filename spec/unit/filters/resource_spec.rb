@@ -28,12 +28,25 @@ describe ActiveAdmin::Filters::ResourceExtension do
     resource.filters.should be_empty
   end
 
-  it "should remove a filter" do
-    resource.filters.should include({:attribute => :author})
-    resource.remove_filter :author
-    resource.filters.should_not include({:attribute => :author})
+  context "filter removal" do
+    it "should work" do
+      resource.filters.should include :attribute => :author
+      resource.remove_filter :author
+      resource.filters.should_not include :attribute => :author
+    end
+
+    it "should be lazy" do
+      resource.should_not_receive :default_filters # this hits the DB
+      resource.remove_filter :author
+    end
+
+    it "should not prevent the default filters from being added" do
+      resource.remove_filter :author
+      resource.filters.should_not be_empty
+    end
   end
 
+  # TODO: wrap the below in a context like "filter removal" was above
   it "should add a filter" do
     resource.add_filter :title
     resource.filters.should == [{:attribute => :title}]
@@ -69,6 +82,5 @@ describe ActiveAdmin::Filters::ResourceExtension do
   it "should add a sidebar section for the filters" do
     resource.sidebar_sections.first.name.should == :filters
   end
-
 
 end

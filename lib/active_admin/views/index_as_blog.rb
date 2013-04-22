@@ -67,7 +67,7 @@ module ActiveAdmin
         @page_presenter = page_presenter
         @collection = collection
 
-        # Call the block passed in. This will set the 
+        # Call the block passed in. This will set the
         # title and body methods
         instance_eval &page_presenter.block if page_presenter.block
 
@@ -93,6 +93,10 @@ module ActiveAdmin
         @body
       end
 
+      def self.index_name
+        "blog"
+      end
+
       private
 
       def build_posts
@@ -113,7 +117,9 @@ module ActiveAdmin
       def build_title(post)
         if @title
           h3 do
-            link_to(call_method_or_proc_on(post, @title), resource_path(post))
+            a(:href => resource_path(post)) do
+             render_method_on_post_or_call_proc post, @title
+            end
           end
         else
           h3 do
@@ -124,7 +130,18 @@ module ActiveAdmin
 
       def build_body(post)
         if @body
-          div(call_method_or_proc_on(post, @body), :class => 'content')
+          div :class => 'content' do
+            render_method_on_post_or_call_proc post, @body
+          end
+        end
+      end
+
+      def render_method_on_post_or_call_proc(post, proc)
+        case proc
+        when String,Symbol
+          post.send proc
+        else
+          instance_exec post, &proc
         end
       end
 

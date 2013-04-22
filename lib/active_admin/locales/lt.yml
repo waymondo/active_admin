@@ -21,6 +21,7 @@ lt:
     download: 'Atsisiųsti'
     has_many_new: 'Pridėti naują %{model}'
     has_many_delete: 'Šalinti'
+    has_many_remove: 'Pašalinti'
     filter: 'Filtras'
     clear_filters: 'Išvalyti filtrus'
     search_field: 'Paieškos %{field}'
@@ -79,3 +80,4 @@ lt:
       links:
         sign_in: 'Prisijungti'
         forgot_your_password: 'Pamiršote slaptažodį?'
+        sign_in_with_omniauth_provider: "Prisijunkite su %{provider}"

@@ -1,4 +1,4 @@
-require 'spec_helper' 
+require 'spec_helper'
 
 describe ActiveAdmin::Namespace do
 
@@ -23,9 +23,9 @@ describe ActiveAdmin::Namespace do
       if ActiveAdmin::Dashboards.built?
         # DEPRECATED behavior. If a dashboard was built while running this
         # spec, then an item gets added to the menu
-        namespace.fetch_menu(:default).should have(1).item
+        namespace.fetch_menu(:default).children.should_not be_empty
       else
-        namespace.fetch_menu(:default).items.should be_empty
+        namespace.fetch_menu(:default).children.should be_empty
       end
     end
   end # context "when new"
@@ -86,7 +86,7 @@ describe ActiveAdmin::Namespace do
 
   describe "utility navigation" do
     let(:namespace){ ActiveAdmin::Namespace.new(application, :admin) }
-    let(:menu) do 
+    let(:menu) do
       namespace.build_menu :utility_navigation do |menu|
         menu.add :label => "ActiveAdmin.info", :url => "http://www.activeadmin.info", :html_options => { :target => :blank }
         namespace.add_logout_button_to_menu menu, 1, :class => "matt"

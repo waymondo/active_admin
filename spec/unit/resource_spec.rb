@@ -1,4 +1,4 @@
-require 'spec_helper' 
+require 'spec_helper'
 require File.expand_path('config_shared_examples', File.dirname(__FILE__))
 
 module ActiveAdmin
@@ -94,38 +94,6 @@ module ActiveAdmin
 
     end
 
-    describe "route names" do
-      it "should return the route prefix" do
-        config.route_prefix.should == "admin"
-      end
-      it "should return the route collection path" do
-        config.route_collection_path.should == "/admin/categories"
-      end
-
-      context "when in the root namespace" do
-        let(:config){ application.register Category, :namespace => false}
-        it "should have a nil route_prefix" do
-          config.route_prefix.should == nil
-        end
-
-        it "should generate a correct route" do
-          config
-          reload_routes!
-          config.route_collection_path.should == "/categories"
-        end
-      end
-
-      context "when registering a plural resource" do
-        class ::News; def self.has_many(*); end end
-
-        it "should return the plurali route with _index" do
-          config = application.register News
-          reload_routes!
-          config.route_collection_path.should == "/admin/news"
-        end
-      end
-    end
-
     describe "scoping" do
       context "when using a block" do
         before do
@@ -152,19 +120,6 @@ module ActiveAdmin
           controller.should_receive(:current_user).and_return(true)
           begin_of_association_chain = controller.send(:begin_of_association_chain)
           begin_of_association_chain.should == true
-        end
-      end
-
-      context "when not using a block or symbol" do
-        before do
-          @resource = application.register Category do
-            scope_to "Some string"
-          end
-        end
-        it "should raise and exception" do
-          lambda {
-            @resource.controller.new.send(:begin_of_association_chain)
-          }.should raise_error(ArgumentError)
         end
       end
 
@@ -229,6 +184,13 @@ module ActiveAdmin
         config.scope :published
         config.get_scope_by_id(:published).name.should == "Published"
       end
+
+      it "should retrieve the default scope by proc" do
+        config.scope :published, :default => proc{ true }
+        config.scope :all
+        config.default_scope.name.should == "Published"
+      end
+
     end
 
     describe "#csv_builder" do

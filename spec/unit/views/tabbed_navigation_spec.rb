@@ -8,7 +8,7 @@ describe ActiveAdmin::Views::TabbedNavigation do
   let(:assigns){ { :active_admin_menu => menu } }
   let(:helpers){ mock_action_view }
 
-  let(:tabbed_navigation) do 
+  let(:tabbed_navigation) do
     arbre(assigns, helpers) {
       insert_tag(ActiveAdmin::Views::TabbedNavigation, active_admin_menu)
     }.children.first
@@ -25,31 +25,29 @@ describe ActiveAdmin::Views::TabbedNavigation do
     before do
       menu.add :label => "Blog Posts", :url => :admin_posts_path
 
-      menu.add :label => "Reports",	:url => "/admin/reports" do |reports|
+      menu.add :label => "Reports", :url => "/admin/reports" do |reports|
         reports.add :label => "A Sub Reports", :url => "/admin/a-sub-reports"
         reports.add :label => "B Sub Reports", :url => "/admin/b-sub-reports"
-        reports.add :label => proc{ "Label Proc Sub Reports" }, :url => "/admin/label-proc-sub-reports"
+        reports.add :label => proc{ "Label Proc Sub Reports" }, :url => "/admin/label-proc-sub-reports", :id => "Label Proc Sub Reports"
       end
 
       menu.add :label => "Administration", :url => "/admin/administration" do |administration|
-        administration.add :label => "User administration", 
-                           :url => '/admin/user-administration', 
-                           :priority => 10, 
+        administration.add :label => "User administration",
+                           :url => '/admin/user-administration',
+                           :priority => 10,
                            :if => proc { false }
       end
 
       menu.add :label => "Management", :url => "#" do |management|
-        management.add :label => "Order management", 
-                       :url => '/admin/order-management', 
-                       :priority => 10, 
+        management.add :label => "Order management",
+                       :url => '/admin/order-management',
+                       :priority => 10,
                        :if => proc { false }
-        management.add :label => "Bill management", 
-                       :url => '/admin/bill-management', 
-                       :priority => 10, 
+        management.add :label => "Bill management",
+                       :url => '/admin/bill-management',
+                       :priority => 10,
                        :if => :admin_logged_in?
       end
-
-
     end
 
     it "should generate a ul" do
@@ -73,7 +71,7 @@ describe ActiveAdmin::Views::TabbedNavigation do
       html.should have_tag("li", :parent => { :tag => "ul" }, :attributes => {:id => "b_sub_reports"})
     end
 
-    it "should generate a valid dom_id from a label proc" do
+    it "should generate a valid id from a label proc" do
       html.should have_tag("li", :parent => { :tag => "ul" }, :attributes => {:id => "label_proc_sub_reports"})
     end
 
@@ -124,19 +122,19 @@ describe ActiveAdmin::Views::TabbedNavigation do
 
     it "should not include menu items with an if block that returns false" do
       menu.add :label => "Don't Show", :url => "/", :priority => 10, :if => proc{ false }
-      tabbed_navigation.menu_items.should == []
+      tabbed_navigation.menu_items.should be_empty
     end
 
     it "should not include menu items with an if block that calls a method that returns false" do
       menu.add :label => "Don't Show", :url => "/", :priority => 10, :if => :admin_logged_in?
-      tabbed_navigation.menu_items.should == []
+      tabbed_navigation.menu_items.should be_empty
     end
 
     it "should not display any items that have no children to display" do
       menu.add :label => "Parent", :url => "#" do |p|
         p.add :label => "Child", :url => "/", :priority => 10, :if => proc{ false }
       end
-      tabbed_navigation.menu_items.should == []
+      tabbed_navigation.menu_items.should be_empty
     end
 
     it "should display a parent that has a child to display" do
@@ -148,5 +146,4 @@ describe ActiveAdmin::Views::TabbedNavigation do
     end
 
   end
-
 end
