@@ -49,20 +49,17 @@ module ActiveAdmin
         span I18n.t('active_admin.empty'), :class => "empty"
       end
 
-      def content_for(attr_or_proc)
-        value = case attr_or_proc
-                when Proc
-                  attr_or_proc.call(@record)
-                else
-                  content_for_attribute(attr_or_proc)
-                end
-        value = pretty_format(value)
-        value == "" || value.nil? ? empty_value : value
+      def content_for(attr)
+        previous = current_arbre_element.to_s
+        value    = pretty_format find_attr_value attr
+        value.blank? && previous == current_arbre_element.to_s ? empty_value : value
       end
 
-      def content_for_attribute(attr)
-        if attr.to_s =~ /^([\w]+)_id$/ && @record.respond_to?($1.to_sym)
-          content_for_attribute($1)
+      def find_attr_value(attr)
+        if attr.is_a?(Proc)
+          attr.call(@record)
+        elsif attr.to_s[/\A(.+)_id\z/] && @record.respond_to?($1.to_sym)
+          @record.send($1.to_sym)
         else
           @record.send(attr.to_sym)
         end

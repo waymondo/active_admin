@@ -16,7 +16,7 @@ describe ActiveAdmin::AuthorizationAdapter do
 
     it "should return the collection unscoped" do
       collection = stub
-      adapter.scope_collection(collection).should == collection
+      adapter.scope_collection(collection, ActiveAdmin::Auth::READ).should == collection
     end
 
   end
@@ -40,7 +40,7 @@ describe ActiveAdmin::AuthorizationAdapter do
 
     let(:adapter) { auth_class.new(stub, stub) }
 
-    it "should match agains a class" do
+    it "should match against a class" do
       adapter.authorized?(:read, String).should == true
     end
 
