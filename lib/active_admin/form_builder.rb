@@ -9,7 +9,7 @@ module ActiveAdmin
     end
 
     def inputs(*args, &block)
-      @inputs_with_block = block_given?
+      @use_form_buffer = block_given?
       form_buffers.last << with_new_form_buffer{ super }
     end
 
@@ -17,7 +17,7 @@ module ActiveAdmin
     # to the form buffer. Else, return it directly.
     def input(method, *args)
       content = with_new_form_buffer{ super }
-      @inputs_with_block ? form_buffers.last << content : content
+      @use_form_buffer ? form_buffers.last << content : content
     end
 
     def cancel_link(url = {:action => "index"}, html_options = {}, li_attrs = {})
@@ -130,7 +130,7 @@ module ActiveAdmin
       "ActiveAdmin::Inputs::#{as.to_s.camelize}Input"
     end
 
-    # prevent exceptions in production environment for better performance
+    # Overrides Formtastic's version to include ActiveAdmin::Inputs::*
     def input_class_with_const_defined(as)
       input_class_name = custom_input_class_name(as)
 
@@ -141,7 +141,7 @@ module ActiveAdmin
       elsif Formtastic::Inputs.const_defined?(input_class_name)
         standard_input_class_name(as).constantize
       else
-        raise Formtastic::UnknownInputError
+        raise Formtastic::UnknownInputError, "Unable to find input class #{input_class_name}"
       end
     end
 
@@ -183,7 +183,7 @@ module ActiveAdmin
     def js_for_has_many(association, form_block, template)
       assoc_reflection = object.class.reflect_on_association(association)
       assoc_name       = assoc_reflection.klass.model_name
-      placeholder      = "NEW_#{assoc_name.upcase.split(' ').join('_')}_RECORD"
+      placeholder      = "NEW_#{assoc_name.to_s.upcase.split(' ').join('_')}_RECORD"
       opts = {
         :for         => [association, assoc_reflection.klass.new],
         :class       => "inputs has_many_fields",

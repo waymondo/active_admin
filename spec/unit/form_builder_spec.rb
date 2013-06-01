@@ -69,38 +69,6 @@ describe ActiveAdmin::FormBuilder do
     end
   end
 
-  context "in general with actions" do
-    let :body do
-      build_form do |f|
-        f.inputs do
-          f.input :title
-          f.input :body
-        end
-        f.actions do
-          f.action :submit, :button_html => { :value => "Submit Me" }
-          f.action :submit, :button_html => { :value => "Another Button" }
-        end
-      end
-    end
-
-    it "should generate a text input" do
-      body.should have_tag("input", :attributes => { :type => "text",
-                                                     :name => "post[title]" })
-    end
-    it "should generate a textarea" do
-      body.should have_tag("textarea", :attributes => { :name => "post[body]" })
-    end
-    it "should only generate the form once" do
-      body.scan(/Title/).size.should == 1
-    end
-    it "should generate actions" do
-      body.should have_tag("input", :attributes => {  :type => "submit",
-                                                          :value => "Submit Me" })
-      body.should have_tag("input", :attributes => {  :type => "submit",
-                                                          :value => "Another Button" })
-    end
-  end
-
   context "when polymorphic relationship" do
     it "should raise error" do
       lambda {
@@ -321,6 +289,15 @@ describe ActiveAdmin::FormBuilder do
         begin
           I18n.backend.store_translations(:en, :activerecord => { :models => { :post => { :one => "Blog Post", :other => "Blog Posts" } } })
           body.should have_tag('a', 'Add New Blog Post')
+        ensure
+          I18n.backend.reload!
+        end
+      end
+
+      it "should translate the attribute name" do
+        begin
+          I18n.backend.store_translations :en, :activerecord => { :attributes => { :post => { :title => 'A very nice title' } } }
+          body.should have_tag 'label', 'A very nice title'
         ensure
           I18n.backend.reload!
         end
