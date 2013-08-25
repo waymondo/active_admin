@@ -19,7 +19,8 @@ module ActiveAdmin
 
       protected
 
-      # Returns the default filter type for a given attribute
+      # Returns the default filter type for a given attribute. If you want
+      # to use a custom search method, you have to specify the type yourself.
       def default_input_type(method, options = {})
         if method =~ /_(contains|starts_with|ends_with)\z/
           :string
@@ -74,8 +75,8 @@ module ActiveAdmin
           end
 
           buttons = content_tag :div, :class => "buttons" do
-            f.submit(I18n.t('active_admin.filter')) +
-              link_to(I18n.t('active_admin.clear_filters'), "#", :class => "clear_filters_btn") +
+            f.submit(I18n.t('active_admin.filters.buttons.filter')) +
+              link_to(I18n.t('active_admin.filters.buttons.clear'), '#', :class => 'clear_filters_btn') +
               hidden_field_tags_for(params, :except => [:q, :page])
           end
 

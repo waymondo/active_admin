@@ -1,5 +1,10 @@
 require 'spec_helper'
 
+class Post
+  scope :custom_searcher, ->stuff { where(body: stuff) }
+  search_method :custom_searcher
+end
+
 describe ActiveAdmin::Filters::ViewHelper do
 
   # Setup an ActionView::Base object which can be used for
@@ -28,8 +33,10 @@ describe ActiveAdmin::Filters::ViewHelper do
   end
 
   def filter(name, options = {})
-    render_filter Post.search, @filters.push(options.merge(:attribute => name))
+    render_filter scope, @filters.push(options.merge(:attribute => name))
   end
+
+  let(:scope) { Post.search }
 
   before(:each) { @filters = [] }
 
@@ -71,8 +78,7 @@ describe ActiveAdmin::Filters::ViewHelper do
     end
 
     it "should generate a text field for input" do
-      body.should have_tag("input", :attributes => {
-                                          :name => /q\[(title_starts_with|title_ends_with|title_contains)\]/ })
+      body.should have_tag("input", :attributes => { :name => 'q[title_contains]' })
     end
     
     it "should have a proper label" do
@@ -141,6 +147,27 @@ describe ActiveAdmin::Filters::ViewHelper do
     end
   end
 
+  describe "text attribute, as a select" do
+    let(:body) { filter :title, as: :select }
+    let(:builder) { ActiveAdmin::Inputs::FilterSelectInput }
+
+    context "when loading collection from DB" do
+      it "should use pluck for efficiency" do
+        builder.any_instance.should_receive(:pluck_column) { [] }
+        body
+      end
+
+      it "should remove original ordering to prevent PostgreSQL error" do
+        scope.base.should_receive(:reorder).with('title asc') {
+          m = mock uniq: mock(pluck: ['A Title'])
+          m.uniq.should_receive(:pluck).with :title
+          m
+        }
+        body
+      end
+    end
+  end unless Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR < 2
+
   describe "datetime attribute" do
     let(:body) { filter :created_at }
 
@@ -159,17 +186,16 @@ describe ActiveAdmin::Filters::ViewHelper do
     let(:body) { filter :id }
 
     it "should generate a select option for equal to" do
-      body.should have_tag("option", "Equal To", :attributes => { :value => 'id_eq' })
+      body.should have_tag("option", "Equals", :attributes => { :value => 'id_equals' })
     end
     it "should generate a select option for greater than" do
-      body.should have_tag("option", "Greater Than")
+      body.should have_tag("option", "Greater than")
     end
     it "should generate a select option for less than" do
-      body.should have_tag("option", "Less Than")
+      body.should have_tag("option", "Less than")
     end
     it "should generate a text field for input" do
-      body.should have_tag("input", :attributes => {
-                                          :name => /q\[(id_eq|id_equals)\]/ })
+      body.should have_tag("input", :attributes => { :name => 'q[id_equals]' })
     end
     it "should select the option which is currently being filtered"
   end
@@ -216,8 +242,8 @@ describe ActiveAdmin::Filters::ViewHelper do
 
       it "should generate a numeric filter" do
         body.should have_tag 'label', 'Author' # really this should be Author ID :/
-        body.should have_tag 'option', :attributes => { :value => 'author_id_lt' }
-        body.should have_tag 'input',  :attributes => { :id => 'q_author_id', :name => 'q[author_id_eq]'}
+        body.should have_tag 'option', :attributes => { :value => 'author_id_less_than' }
+        body.should have_tag 'input',  :attributes => { :id => 'q_author_id', :name => 'q[author_id_equals]'}
       end
     end
 
@@ -225,7 +251,7 @@ describe ActiveAdmin::Filters::ViewHelper do
       let(:body) { filter :author }
 
       it "should generate a select" do
-        body.should have_tag "select",             :attributes => { :name => "q[author_id_in]" }
+        body.should have_tag "select",             :attributes => { :name => "q[author_id_eq]" }
       end
       it "should set the default text to 'Any'" do
         body.should have_tag "option", "Any",      :attributes => { :value => "" }
@@ -311,6 +337,19 @@ describe ActiveAdmin::Filters::ViewHelper do
       it "should NOT be displayed if true" do
         body.should_not have_tag("input", :attributes => { :name => "q[updated_at_gte]"})
       end
+    end
+  end
+
+  describe "custom search methods" do
+
+    it "should work as select" do
+      body = filter :custom_searcher, as: :select, collection: ['foo']
+      body.should have_tag "select", attributes: { name: "q[custom_searcher]" }
+    end
+
+    pending "should work as string" do
+      body = filter :custom_searcher, as: :string
+      body.should have_tag "input", attributes: { name: "q[custom_searcher]" }
     end
   end
 

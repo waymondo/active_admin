@@ -113,14 +113,14 @@ describe ActiveAdmin::FormBuilder do
         end
         f.actions
       end
-      body.scan(/id=\"post_title\"/).size.should == 1
+      body.scan(/id="post_title"/).size.should == 1
     end
     it "should generate one button and a cancel link" do
       body = build_form do |f|
         f.actions
       end
-      body.scan(/type=\"submit\"/).size.should == 1
-      body.scan(/class=\"cancel\"/).size.should == 1
+      body.scan(/type="submit"/).size.should == 1
+      body.scan(/class="cancel"/).size.should == 1
     end
     it "should generate multiple actions" do
       body = build_form do |f|
@@ -129,8 +129,8 @@ describe ActiveAdmin::FormBuilder do
           f.action :submit, :label => "Create & Edit"
         end
       end
-      body.scan(/type=\"submit\"/).size.should == 2
-      body.scan(/class=\"cancel\"/).size.should == 0
+      body.scan(/type="submit"/).size.should == 2
+      body.scan(/class="cancel"/).size.should == 0
     end
 
   end
@@ -143,14 +143,14 @@ describe ActiveAdmin::FormBuilder do
         end
         f.actions
       end
-      body.scan(/id=\"post_title\"/).size.should == 1
+      body.scan(/id="post_title"/).size.should == 1
     end
     it "should generate one button and a cancel link" do
       body = build_form do |f|
         f.actions
       end
-      body.scan(/type=\"submit\"/).size.should == 1
-      body.scan(/class=\"cancel\"/).size.should == 1
+      body.scan(/type="submit"/).size.should == 1
+      body.scan(/class="cancel"/).size.should == 1
     end
     it "should generate multiple actions" do
       body = build_form do |f|
@@ -159,8 +159,8 @@ describe ActiveAdmin::FormBuilder do
           f.action :submit, :label => "Create & Edit"
         end
       end
-      body.scan(/type=\"submit\"/).size.should == 2
-      body.scan(/class=\"cancel\"/).size.should == 0
+      body.scan(/type="submit"/).size.should == 2
+      body.scan(/class="cancel"/).size.should == 0
     end
   end
 
@@ -212,7 +212,7 @@ describe ActiveAdmin::FormBuilder do
         end
       end
       it "should create 2 options" do
-        body.scan(/\<option/).size.should == 3
+        body.scan(/<option/).size.should == 3
       end
     end
 
@@ -223,7 +223,7 @@ describe ActiveAdmin::FormBuilder do
         end
       end
       it "should create 2 radio buttons" do
-        body.scan(/type=\"radio\"/).size.should == 2
+        body.scan(/type="radio"/).size.should == 2
       end
     end
 
@@ -437,18 +437,23 @@ describe ActiveAdmin::FormBuilder do
     end
   end
 
-  {
-    "input :title, :as => :string"               => /id\=\"post_title\"/,
-    "input :title, :as => :text"                 => /id\=\"post_title\"/,
-    "input :created_at, :as => :time_select"     => /id\=\"post_created_at_2i\"/,
-    "input :created_at, :as => :datetime_select" => /id\=\"post_created_at_2i\"/,
-    "input :created_at, :as => :date_select"     => /id\=\"post_created_at_2i\"/,
+  { # Testing that the same input can be used multiple times
+    "f.input :title, :as => :string"               => /id="post_title"/,
+    "f.input :title, :as => :text"                 => /id="post_title"/,
+    "f.input :created_at, :as => :time_select"     => /id="post_created_at_2i"/,
+    "f.input :created_at, :as => :datetime_select" => /id="post_created_at_2i"/,
+    "f.input :created_at, :as => :date_select"     => /id="post_created_at_2i"/,
+    # Testing that return values don't screw up the form
+    "f.input :title; nil"                          => /id="post_title"/,
+    "f.input :title; []"                           => /id="post_title"/,
+    "[:title].each{ |r| f.input r }"               => /id="post_title"/,
+    "[:title].map { |r| f.input r }"               => /id="post_title"/,
   }.each do |source, regex|
-   it "should properly buffer #{source}" do
+   it "should properly buffer `#{source}`" do
      body = build_form do |f|
        f.inputs do
-         f.instance_eval(source)
-         f.instance_eval(source)
+         eval source
+         eval source
        end
      end
      body.scan(regex).size.should == 2
@@ -467,21 +472,6 @@ describe ActiveAdmin::FormBuilder do
       body.should have_tag("input", :attributes => {  :type => "text",
                                                           :class => "datepicker",
                                                           :name => "post[created_at]" })
-    end
-  end
-
-  describe "inputs block with nil return value" do
-    let :body do
-      build_form do |f|
-        f.inputs do
-          f.input :title
-          nil
-        end
-      end
-    end
-
-    it "should generate a single input field" do
-      body.should have_tag("input", :attributes => { :type => "text", :name => "post[title]" })
     end
   end
 
