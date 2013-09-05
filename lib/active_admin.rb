@@ -14,6 +14,9 @@ require 'coffee-rails'
 require 'arbre'
 
 require 'active_admin/helpers/i18n'
+require 'carrierwave'
+require 'mini_magick'
+require 'redactor-rails'
 
 module ActiveAdmin
 

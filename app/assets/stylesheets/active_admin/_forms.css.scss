@@ -135,6 +135,17 @@ form {
     }
   }
 
+  /* Redactor Box */
+  .redactor_box {
+    width: 76%;
+    border: 1px solid #c9d0d6;
+    @include rounded;
+    font-size: 0.95em;
+    @include sans-family;
+    outline: none;
+    display: inline-block;
+  }
+
   fieldset > ol > li {
 
     /* Hints */
@@ -326,4 +337,3 @@ form.filter_form {
   }
   a.clear_filters_btn { @include light-button; }
 }
-
