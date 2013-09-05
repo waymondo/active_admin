@@ -11,6 +11,9 @@ require 'jquery-rails'
 require 'jquery-ui-rails'
 require 'coffee-rails'
 require 'arbre'
+require 'carrierwave'
+require 'mini_magick'
+require 'redactor-rails'
 require 'active_admin/engine'
 
 module ActiveAdmin

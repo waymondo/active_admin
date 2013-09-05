@@ -30,4 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails",               ">= 3.2.0"
   s.add_dependency "ransack",             ">= 1.0.0"
   s.add_dependency "sass-rails",          ">= 3.2.0"
+  s.add_dependency "redactor-rails",      ">= 0.3.6"
+  s.add_dependency "carrierwave",         ">= 0.9.0"
+  s.add_dependency "mini_magick",         ">= 3.4"
 end

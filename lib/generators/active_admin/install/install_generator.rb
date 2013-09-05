@@ -35,6 +35,7 @@ module ActiveAdmin
       end
 
       def create_assets
+        generate "redactor:install"
         generate "active_admin:assets"
       end
 
