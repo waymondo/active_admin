@@ -2,7 +2,7 @@
 # that lets you select from a set of search methods for a given attribute.
 #
 # Your class must declare available filters for this module to work.
-# Those filters must be recognizable by Metasearch. For example:
+# Those filters must be recognizable by Ransack. For example:
 #
 #   class FilterNumericInput < ::Formtastic::Inputs::NumberInput
 #     include FilterBase
@@ -30,7 +30,7 @@ module ActiveAdmin
 
         def wrapper_html_options
           opts = super
-          (opts[:class] ||= '') << ' select_and_search'
+          (opts[:class] ||= '') << ' select_and_search' unless seems_searchable?
           opts
         end
 

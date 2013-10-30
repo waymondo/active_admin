@@ -2,7 +2,12 @@
 
 By default, the index view includes a way to quickly delete records from the listing,
 as well as an API for you to easily create your own "Batch Action" for handling a request to operate
-on multiple records at once.
+on multiple records at once.  If you override the default index, `selectable_column` must be used as the first column to enable batch actions:
+
+    index do
+      selectable_column
+      # add other columns here...
+    end
 
 ## Provided Batch Action
 
@@ -19,6 +24,7 @@ to operate on.  The array should contain at least one ID.
         Post.find(selection).each do |post|
           post.flag! :hot
         end
+        redirect_to collection_path, :alert => "The posts have been flagged."
       end
     end
 
@@ -115,26 +121,6 @@ You can also request that the user confirm the action, before the action is perf
       end
     end
 
-### Customizing Table Columns
-
-To include the column with checkboxes in after overriding the list of columns for the `index` block in the *Table* listing, use the following helper as seen below:
-
-    ActiveAdmin.register Post do
-
-      batch_action :flag do |selection|
-        Post.find(selection).each { |p| p.flag! }
-        redirect_to collection_path, :notice => "Posts flagged!"
-      end
-
-      index do
-        selectable_column
-        column :title
-        default_actions
-      end
-
-    end
-
-
 ### Support for Other Index Types
 
 You can easily use `batch_action` in the other index views, *Grid*, *Block*, and *Blog*; however, these views will require more custom styling to fit your application needs.
@@ -159,3 +145,11 @@ You can easily use `batch_action` in the other index views, *Grid*, *Block*, and
       end
 
     end
+
+### Batch Actions and Custom Actions 
+
+In order to perform the batch action, the entire *Table*, *Grid*, etc. is wrapped in a form that submits the id's of the selected rows to your batch_action.
+
+Since nested `<form>` tags in HTML often results in unexpected behavior, you may need to modify custom actions or forms you are using on your page with batch actions enabled. 
+
+Specifically, if you are using HTTP methods like `PUT` or `PATCH` with a custom form on your index page this may result in your batch action being `PUT`ed instead of `POST`ed which in turn will create a routing error. You can get around this by either moving the nested form to another page (ie. the Object's show page) or, if possible, changing the method of the custom action to `POST` so that it doesn't override the batch action. Remember, behavior may vary by browser.

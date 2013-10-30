@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 class Post
-  scope :custom_searcher, ->stuff { where(body: stuff) }
-  search_method :custom_searcher
+  ransacker :custom_searcher do
+    # nothing to see here
+  end
 end
 
 describe ActiveAdmin::Filters::ViewHelper do
@@ -27,19 +28,16 @@ describe ActiveAdmin::Filters::ViewHelper do
   end
 
   def render_filter(search, filters)
-    render_arbre_component({:filter_args => [search, filters]}, helpers) do
-      text_node active_admin_filters_form_for(*assigns[:filter_args])
+    render_arbre_component({filter_args: [search, filters]}, helpers) do
+      text_node active_admin_filters_form_for *assigns[:filter_args]
     end
   end
 
   def filter(name, options = {})
-    render_filter scope, @filters.push(options.merge(:attribute => name))
+    render_filter scope, name => options
   end
 
   let(:scope) { Post.search }
-
-  before(:each) { @filters = [] }
-
 
   describe "the form in general" do
     let(:body) { filter :title }
@@ -121,7 +119,7 @@ describe ActiveAdmin::Filters::ViewHelper do
     context "using ends_with and as" do
       let(:body) { filter :title_ends_with }
 
-      it "should generate a search field for a string attribute with query starts_with" do
+      it "should generate a search field for a string attribute with query ends_with" do
         body.should have_tag("input", :attributes => { :name => "q[title_ends_with]" })
       end
     end
@@ -147,7 +145,7 @@ describe ActiveAdmin::Filters::ViewHelper do
     end
   end
 
-  describe "text attribute, as a select" do
+  describe "string attribute, as a select" do
     let(:body) { filter :title, as: :select }
     let(:builder) { ActiveAdmin::Inputs::FilterSelectInput }
 
@@ -158,27 +156,27 @@ describe ActiveAdmin::Filters::ViewHelper do
       end
 
       it "should remove original ordering to prevent PostgreSQL error" do
-        scope.base.should_receive(:reorder).with('title asc') {
-          m = mock uniq: mock(pluck: ['A Title'])
+        scope.object.klass.should_receive(:reorder).with('title asc') {
+          m = double uniq: double(pluck: ['A Title'])
           m.uniq.should_receive(:pluck).with :title
           m
         }
         body
       end
     end
-  end unless Rails::VERSION::MAJOR == 3 && Rails::VERSION::MINOR < 2
+  end
 
   describe "datetime attribute" do
     let(:body) { filter :created_at }
 
     it "should generate a date greater than" do
-      body.should have_tag("input", :attributes => { :name => "q[created_at_gte]", :class => "datepicker"})
+      body.should have_tag("input", :attributes => { :name => "q[created_at_gteq]", :class => "datepicker"})
     end
     it "should generate a seperator" do
       body.should have_tag("span", :attributes => { :class => "seperator"})
     end
     it "should generate a date less than" do
-      body.should have_tag("input", :attributes => { :name => "q[created_at_lte]", :class => "datepicker"})
+      body.should have_tag("input", :attributes => { :name => "q[created_at_lteq]", :class => "datepicker"})
     end
   end
 
@@ -221,11 +219,11 @@ describe ActiveAdmin::Filters::ViewHelper do
     end
 
     context "non-boolean data types" do
-      let(:body) { filter :title_is_present, :as => :boolean }
+      let(:body) { filter :title_present, :as => :boolean }
 
       it "should create a check box for equals to" do
         body.should have_tag("input", :attributes => {
-                                            :name => "q[title_is_present]",
+                                            :name => "q[title_present]",
                                             :type => "checkbox" })
       end
     end
@@ -294,48 +292,97 @@ describe ActiveAdmin::Filters::ViewHelper do
     end
 
     context "when polymorphic relationship" do
+      let(:scope) { ActiveAdmin::Comment.search }
       it "should raise an error if a collection isn't provided" do
-        expect {
-          search = ActiveAdmin::Comment.search
-          render_filter(search, [{:attribute => :resource}])
-        }.to raise_error Formtastic::PolymorphicInputWithoutCollectionError
+        expect { filter :resource }.to raise_error \
+          Formtastic::PolymorphicInputWithoutCollectionError
       end
     end
   end # belongs to
 
   describe "has_and_belongs_to_many" do
-    pending "add HABTM models so this can be mocked out"
+    pending "add HABTM models so this can be tested"
+  end
+
+  describe "has_many :through" do
+    # Setup an ActionView::Base object which can be used for
+    # generating the form for.
+    let(:helpers) do
+      view = action_view
+      def view.collection_path
+        "/categories"
+      end
+
+      def view.protect_against_forgery?
+        false
+      end
+
+      def view.a_helper_method
+        "A Helper Method"
+      end
+
+      view
+    end
+    let(:scope) { Category.search }
+
+    let!(:john) { User.create :first_name => "John", :last_name => "Doe", :username => "john_doe" }
+    let!(:jane) { User.create :first_name => "Jane", :last_name => "Doe", :username => "jane_doe" }
+
+    context "when given as the name of the relationship" do
+      let(:body) { filter :authors }
+
+      it "should generate a select" do
+        body.should have_tag 'select', :attributes => { :name => "q[posts_author_id_eq]" }
+      end
+
+      it "should set the default text to 'Any'" do
+        body.should have_tag "option", "Any", :attributes => { :value => "" }
+      end
+
+      it "should create an option for each related object" do
+        body.should have_tag "option", "John Doe", :attributes => { :value => john.id }
+        body.should have_tag "option", "Jane Doe", :attributes => { :value => jane.id }
+      end
+    end
+
+    context "as check boxes" do
+      let(:body) { filter :authors, :as => :check_boxes }
+
+      it "should create a check box for each related object" do
+        body.should have_tag("input", :attributes => {
+                                            :name => "q[posts_author_id_in][]",
+                                            :type => "checkbox",
+                                            :value => john.id })
+        body.should have_tag("input", :attributes => {
+                                            :name => "q[posts_author_id_in][]",
+                                            :type => "checkbox",
+                                            :value => jane.id })
+      end
+    end
   end
 
   describe "conditional display" do
-
     context "with :if block" do
-      let(:body) do
-        filter :body,   :if => proc{true}
-        filter :author, :if => proc{false}
-      end
-
       it "should be displayed if true" do
-        body.should have_tag("input", :attributes => { :name => "q[body_contains]"})
+        body = filter :body,   if: proc{true}
+        body.should     have_tag "input", attributes: {name: "q[body_contains]"}
       end
 
       it "should NOT be displayed if false" do
-        body.should_not have_tag("input", :attributes => { :name => "q[author_id_eq]"})
+        body = filter :author, if: proc{false}
+        body.should_not have_tag "input", attributes: {name: "q[author_id_eq]"}
       end
     end
 
     context "with :unless block" do
-      let(:body) do
-        filter :created_at, :unless => proc{false}
-        filter :updated_at, :unless => proc{true}
-      end
-
       it "should be displayed if false" do
-        body.should have_tag("input", :attributes => { :name => "q[created_at_gte]"})
+        body = filter :created_at, unless: proc{false}
+        body.should     have_tag "input", attributes: {name: "q[created_at_gteq]"}
       end
 
       it "should NOT be displayed if true" do
-        body.should_not have_tag("input", :attributes => { :name => "q[updated_at_gte]"})
+        body = filter :updated_at, unless: proc{true}
+        body.should_not have_tag "input", attributes: {name: "q[updated_at_gteq]"}
       end
     end
   end
@@ -347,9 +394,29 @@ describe ActiveAdmin::Filters::ViewHelper do
       body.should have_tag "select", attributes: { name: "q[custom_searcher]" }
     end
 
-    pending "should work as string" do
+    it "should work as string" do
       body = filter :custom_searcher, as: :string
       body.should have_tag "input", attributes: { name: "q[custom_searcher]" }
+    end
+  end
+
+  describe "blank option" do
+    context "for a select filter" do
+      it "should be there by default" do
+        filter(:author).should have_tag "option", "Any"
+      end
+      it "should be able to be disabled" do
+        filter(:author, include_blank: false).should_not have_tag "option", "Any"
+      end
+    end
+
+    context "for a multi-select filter" do
+      it "should not be there by default" do
+        filter(:author, multiple: true).should_not have_tag "option", "Any"
+      end
+      it "should be able to be enabled" do
+        filter(:author, multiple: true, include_blank: true).should have_tag "option", "Any"
+      end
     end
   end
 

@@ -1,5 +1,4 @@
 require 'inherited_resources'
-require 'active_admin/resource_controller/actions'
 require 'active_admin/resource_controller/action_builder'
 require 'active_admin/resource_controller/data_access'
 require 'active_admin/resource_controller/decorators'
@@ -16,7 +15,6 @@ module ActiveAdmin
     respond_to :html, :xml, :json
     respond_to :csv, :only => :index
 
-    include Actions
     include ActionBuilder
     include Decorators
     include DataAccess

@@ -1,7 +1,7 @@
 # Customizing the Form
 
 Active Admin gives complete control over the output of the form by creating a thin DSL on top of
-the fabulous DSL created by Formtastic (http://github.com/justinfrench/formtastic).
+the fabulous DSL created by [Formtastic](http://github.com/justinfrench/formtastic).
 
     ActiveAdmin.register Post do
 
@@ -19,8 +19,8 @@ the fabulous DSL created by Formtastic (http://github.com/justinfrench/formtasti
 
     end
 
-Please view the documentation for Formtastic to see all the wonderful things you can do:
-http://github.com/justinfrench/formtastic
+Please view [the documentation](http://github.com/justinfrench/formtastic)
+for Formtastic to see all the wonderful things you can do.
 
 If you require a more custom form than can be provided through the DSL, you can pass
 a partial in to render the form yourself.
@@ -69,4 +69,14 @@ on the association to use this option.
 The `:heading` option will add a custom heading to has_many form. You can hide a heading by setting `:heading => false`.
 
 The `:new_record` option will show or hide new record link at the bottom of has_many form. It is set as true by default.
+
+## Displaying Errors
+
+To display a list of all errors, include `semantic_errors` at top of form. Particularly useful to display errors on the base or virtual attributes.
+
+    form do |f|
+      f.semantic_errors *f.object.errors.keys
+      f.inputs
+      f.actions
+    end
 

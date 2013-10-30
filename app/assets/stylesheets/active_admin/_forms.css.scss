@@ -32,8 +32,11 @@ form {
         float: left;
         font-size: 1.0em;
         font-weight: bold;
-        color: $section-header-text-color;
-        abbr { border: none; color: #aaa; }
+        color: $form-label-color;
+        abbr {
+          border: none;
+          color:  $required-field-marker-color;
+        }
       }
     }
 
@@ -151,6 +154,11 @@ form {
       }
     }
 
+    /* Hidden fields */
+    &.hidden {
+      padding: 0;
+    }
+
     /* Errors */
     p.inline-errors {
       text-transform:capitalize;
@@ -166,7 +174,7 @@ form {
     }
 
     &.error {
-      input[type=text], input[type=password], input[type=email], input[type=url], input[type=tel], textarea {
+      input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=tel], textarea {
         border: 1px solid $error-color;
       }
     }
@@ -219,7 +227,7 @@ $sidebar-inner-content-width: $sidebar-width - ($section-padding * 2);
   label {
     display: block;
     text-transform: uppercase;
-    color: $section-header-text-color;
+    color:  $form-label-color;
     font-size: 0.9em;
     font-weight: bold;
   }
@@ -262,6 +270,10 @@ form.filter_form {
 
     &.filter_check_boxes {
       label { margin-bottom: 3px; }
+      fieldset {
+        margin-bottom: 0px;
+        padding-bottom: 0px;
+      }
       .check_boxes_wrapper label {
         font-weight: normal;
         margin-bottom: 3px;
@@ -279,7 +291,7 @@ form.filter_form {
       }
 
       input[type=text] {
-        background: #fff url(active_admin_image_path('datepicker/datepicker-input-icon.png')) no-repeat 100% 7px;
+        background: #fff image-url('active_admin/datepicker/datepicker-input-icon.png') no-repeat 100% 7px;
         padding-right: $date-range-filter-input-right-padding;
         width: $date-range-filter-input-width;
       }
