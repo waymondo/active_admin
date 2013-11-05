@@ -312,11 +312,8 @@ describe ActiveAdmin::FormBuilder do
       end
 
       it "should add a link to remove new nested records" do
-        Capybara.string(body).should have_css(".has_many > fieldset > ol > li.has_many_delete > a", :class => "button", :href => "#", :content => "Delete")
-      end
-
-      it "should include the nested record's class name in the js" do
-        body.should have_tag("a", :attributes => { :onclick => /NEW_POST_RECORD/ })
+        Capybara.string(body).should have_css '.has_many > fieldset > ol > li > a', href: '#',
+          content: 'Remove', class: 'button has_many_remove', data: {placeholder: 'NEW_POST_RECORD'}
       end
 
       it "should add a link to add new nested records" do
@@ -380,6 +377,22 @@ describe ActiveAdmin::FormBuilder do
 
     end
 
+    describe "with custom new record link" do
+      let :body do
+        build_form({:url => '/categories'}, Category.new) do |f|
+          f.object.posts.build
+          f.has_many :posts, :new_record => 'My Custom New Post' do |p|
+            p.input :title
+          end
+        end
+      end
+
+      it "should add a custom new record link" do
+        body.should have_tag('a', 'My Custom New Post')
+      end
+
+    end
+
     describe "with allow destroy" do
       context "with an existing post" do
         let :body do
@@ -396,11 +409,11 @@ describe ActiveAdmin::FormBuilder do
         end
 
         it "should have a check box with 'Remove' as its label" do
-          body.should have_tag("label", :attributes => {:for => "category_posts_attributes_0__destroy"}, :content => "Remove")
+          body.should have_tag("label", :attributes => {:for => "category_posts_attributes_0__destroy"}, :content => "Delete")
         end
 
-        it "should wrap the destroy field in an li with class 'has_many_remove'" do
-          Capybara.string(body).should have_css(".has_many > fieldset > ol > li.has_many_remove > input")
+        it "should wrap the destroy field in an li with class 'has_many_delete'" do
+          Capybara.string(body).should have_css(".has_many > fieldset > ol > li.has_many_delete > input")
         end
       end
 
@@ -461,17 +474,40 @@ describe ActiveAdmin::FormBuilder do
   end
 
   describe "datepicker input" do
-    let :body do
-      build_form do |f|
-        f.inputs do
-          f.input :created_at, :as => :datepicker
+    context 'with default options' do
+      let :body do
+        build_form do |f|
+          f.inputs do
+            f.input :created_at, :as => :datepicker
+          end
         end
       end
+      it "should generate a text input with the class of datepicker" do
+        body.should have_tag("input", :attributes => {  :type => "text",
+                                                            :class => "datepicker",
+                                                            :name => "post[created_at]" })
+      end
     end
-    it "should generate a text input with the class of datepicker" do
-      body.should have_tag("input", :attributes => {  :type => "text",
-                                                          :class => "datepicker",
-                                                          :name => "post[created_at]" })
+
+    context 'with date range options' do
+      let :body do
+        build_form do |f|
+          f.inputs do
+            f.input :created_at, :as => :datepicker,
+                                  :datepicker_options => {
+                                    :min_date => Date.new(2013, 10, 18),
+                                    :max_date => "2013-12-31" }
+          end
+        end
+        it 'should generate a datepicker text input with data min and max dates' do
+          body.should have_tag("input", :attributes => { :type => "text",
+                                                            :class => "datepicker",
+                                                            :name => "post[created_at]",
+                                                            :data => { :datepicker_options => {
+                                                              :minDate => "2013-10-18",
+                                                              :maxDate => "2013-12-31" }.to_json }})
+        end
+      end
     end
   end
 

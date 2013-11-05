@@ -2,7 +2,9 @@
 $ ->
 
   $(document).on 'focus', '.datepicker:not(.hasDatepicker)', ->
-    $(@).datepicker dateFormat: 'yy-mm-dd'
+    defaults = dateFormat: 'yy-mm-dd'
+    options = $(@).data 'datepicker-options'
+    $(@).datepicker $.extend(defaults, options)
 
   $("input.timepicker").each ->
     $i = $(@)
