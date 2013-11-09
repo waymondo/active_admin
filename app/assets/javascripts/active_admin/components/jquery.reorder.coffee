@@ -1,5 +1,5 @@
 $ ->
-  $(".index_table").has("td.position").each ->
+  $(".index_table").has("td.col-position").each ->
     $table = $(@)
     id_array = $table.attr('id').split("-")
     resource = id_array[id_array.length - 1]
@@ -15,7 +15,7 @@ $ ->
               $(@).removeClass("odd").addClass("even")
             else
               $(@).removeClass("even").addClass("odd")
-            $(@).find("td.position").text(i)
+            $(@).find("td.col-position").text(i)
       helper: (e, ui) ->
         ui.children().each ->
           $(@).width($(@).width())
