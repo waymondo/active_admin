@@ -68,7 +68,7 @@ end
 
 ### Removal
 
-You can also remove batch actions by simply passing false as the second parameter:
+You can remove batch actions by simply passing false as the second parameter:
 
 ```ruby
 ActiveAdmin.register Post do
@@ -91,7 +91,7 @@ end
 
 ### Priority in the drop-down menu
 
-You can also change the order of batch actions through the `:priority` option:
+You can change the order of batch actions through the `:priority` option:
 
 ```ruby
 ActiveAdmin.register Post do
@@ -99,6 +99,63 @@ ActiveAdmin.register Post do
     # ...
   end
 end
+```
+
+### Confirmation prompt
+
+You can pass a custom string to prompt the user with:
+
+```ruby
+ActiveAdmin.register Post do
+  batch_action :destroy, confirm: "Are you sure??" do |ids|
+    # ...
+  end
+end
+```
+
+### Batch Action forms
+
+If you want to capture input from the user as they perform a batch action,
+Active Admin has just the thing for you:
+
+```ruby
+batch_action :flag, form: {
+  type: %w[Offensive Spam Other],
+  reason: :text,
+  notes:  :textarea,
+  hide:   :checkbox,
+  date:   :datepicker
+} do |ids, inputs|
+  # inputs is a hash of all the form fields you requested
+  redirect_to collection_path, notice: [ids, inputs].to_s
+end
+```
+
+If you pass a nested array, it will behave just like Formtastic would, with the first
+element being the value and the second element being the text displayed.
+
+```ruby
+batch_action :foo, form: {
+  bar: [[2,'Jake'], [45,'Mary']],
+  baz: User.pluck(:id, :name) # multi-pluck new to Rails 4
+} do |ids, inputs|
+  Bar.find(inputs[:bar])
+  User.find(inputs[:baz])
+  # ...
+end
+```
+
+Under the covers this is powered by the JS `ActiveAdmin.modal_dialog` which you can use yourself:
+
+```coffee
+if $('body.admin_users').length
+  $('a[data-prompt]').click ->
+    AA.modal_dialog $(@).data('prompt'), comment: 'textarea',
+      (inputs)=>
+        $.post "/admin/users/#{$(@).data 'id'}/change_state",
+          comment: inputs.comment, state: $(@).data('state'),
+          success: ->
+            window.location.reload()
 ```
 
 ### Translation
@@ -125,18 +182,6 @@ en:
     batch_actions:
       labels:
         publish: "Publish"
-```
-
-### Confirmation prompt
-
-You can also pass a custom string to prompt the user with:
-
-```ruby
-ActiveAdmin.register Post do
-  batch_action :destroy, confirm: "Are you sure??" do |ids|
-    # ...
-  end
-end
 ```
 
 ### Support for other index types

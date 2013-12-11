@@ -15,8 +15,8 @@ unless File.exists?(ENV['RAILS_ROOT'])
   system 'rake setup'
 end
 
-# Ensure the Active Admin load path is happy
 require 'rails'
+require 'active_record'
 require 'active_admin'
 ActiveAdmin.application.load_paths = [ENV['RAILS_ROOT'] + "/app/admin"]
 
@@ -27,6 +27,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 autoload :ActiveAdmin, 'active_admin'
 
 require 'cucumber/rails'
+
+require 'cucumber/rspec/doubles'
 
 require 'capybara/rails'
 require 'capybara/cucumber'
@@ -109,4 +111,9 @@ unless ENV['DEFER_GC'] == '0' || ENV['DEFER_GC'] == 'false'
   require File.expand_path('../../../spec/support/deferred_garbage_collection', __FILE__)
   Before { DeferredGarbageCollection.start }
   After  { DeferredGarbageCollection.reconsider }
+end
+
+# Don't run @rails4 tagged features for versions before Rails 4.
+Before('@rails4') do |scenario|
+  scenario.skip_invoke! if Rails::VERSION::MAJOR < 4
 end

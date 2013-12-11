@@ -22,8 +22,9 @@ end
 Please view [the documentation](http://github.com/justinfrench/formtastic)
 for Formtastic to see all the wonderful things you can do.
 
-If you require a more custom form than can be provided through the DSL, you can
-user a partial instead:
+## Partials
+
+If you require a more custom form than the DSL can provide, use a partial instead:
 
 ```ruby
 ActiveAdmin.register Post do
@@ -63,6 +64,11 @@ ActiveAdmin.register Post do
       end
     end
     f.inputs do
+      f.has_many :taggings, sortable: :position do |t|
+        t.input :tag
+      end
+    end
+    f.inputs do
       f.has_many :comment, new_record: 'Leave Comment' do |b|
         b.input :body
       end
@@ -81,6 +87,9 @@ The `:heading` option adds a custom heading. You can hide it entirely by passing
 
 The `:new_record` option controls the visibility of the new record button (shown by default).
 If you pass a string, it will be used as the text for the new record button.
+
+The `:sortable` option adds a hidden field and will enable drag & drop sorting of the children. It 
+expects the name of the column that will store the index of each child.
 
 ## DatePicker
 

@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_dependency "redactor-rails",      ">= 0.3.2"
   s.add_dependency "carrierwave",         ">= 0.8.0"
   s.add_dependency "mini_magick",         ">= 3.4"
-  s.add_dependency "kaminari",            "~> 0.13"
+  s.add_dependency "kaminari",            "~> 0.14"
   s.add_dependency "rails",               ">= 3.2", "< 4.1"
   s.add_dependency "ransack",             "~> 1.0"
   s.add_dependency "sass-rails"
