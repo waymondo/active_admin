@@ -1,6 +1,5 @@
 require 'active_admin/router'
 require 'active_admin/helpers/settings'
-require 'chosen-rails'
 
 module ActiveAdmin
   class Application
@@ -37,7 +36,7 @@ module ActiveAdmin
 
     # Set the site title image displayed in the main layout (has precendence over :site_title)
     inheritable_setting :site_title_image, ""
-    
+
     # Set a favicon
     inheritable_setting :favicon, false
 
@@ -219,7 +218,7 @@ module ActiveAdmin
       ActiveSupport::Dependencies.autoload_paths.reject!{ |path| load_paths.include? path }
       Rails.application.config.eager_load_paths = # the array is frozen :/
       Rails.application.config.eager_load_paths.reject do |path|
-        load_paths.include?(path) 
+        load_paths.include?(path)
       end
     end
 
