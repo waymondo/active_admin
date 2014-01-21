@@ -179,7 +179,7 @@ AutocompleteCollection.prototype =
       if that.matcher(item)
         return item
 
-    items = @sorter(items)
+    # items = @sorter(items)
     if !items.length
       return if @shown then @hide() else @
 
