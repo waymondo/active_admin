@@ -4,6 +4,8 @@
 #= require jquery-ui/sortable
 #= require jquery-ui/widget
 #= require jquery_ujs
+#= require redactor-rails/redactor
+#= require ./redactor-rails/config
 #
 #= require_self
 #= require_tree ./lib
