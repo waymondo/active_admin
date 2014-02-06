@@ -5,7 +5,8 @@
 #= require jquery.ui.widget
 #= require jquery_ujs
 #= require ./jquery.migrate
-#= require redactor-rails
+#= require redactor-rails/redactor
+#= require ./redactor-rails/config
 #
 #= require_self
 #= require_tree ./lib
