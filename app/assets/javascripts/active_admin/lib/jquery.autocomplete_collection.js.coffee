@@ -180,7 +180,7 @@ AutocompleteCollection.prototype =
         return item
 
     # items = @sorter(items)
-    if !items.length
+    if !items.length and !@allowNew
       return if @shown then @hide() else @
 
     @render(items.slice(0, @options.items)).show()
