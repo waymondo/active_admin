@@ -1,4 +1,4 @@
-AutocompleteCollection = (element, options) ->
+@AutocompleteCollection = (element, options) ->
   @options = $.extend({}, $.fn.autocomplete_collection.defaults, options)
   @resource = @options.resource or @options.method
   @$element = $(element)
@@ -94,7 +94,7 @@ AutocompleteCollection.prototype =
       .addClass("autocomplete-collection-collection-item")
       .attr('data-autocomplete-collection-value', val[@options.property])
       .attr('data-autocomplete-collection-id', val.id)
-      .html val[@options.property]
+      .html("<span class='ac-prop-val'>#{val[@options.property]}</span>")
     $x = $(document.createElement("a"))
       .addClass("autocomplete-collection-remove-item")
       .html("&times;")
@@ -104,8 +104,8 @@ AutocompleteCollection.prototype =
     @$element.val ""
 
   setValue: ->
+    @$element.data('collection', @collection)
     @$hidden.val JSON.stringify @collection
-    # @$hidden.val $.map(@collection, (o) -> "'#{o.id.toString()}'" ).join(",")
 
   collectionAdd: (val) ->
     @collection.push(val)
@@ -113,18 +113,6 @@ AutocompleteCollection.prototype =
 
   collectionRemove: (i) ->
     @collection.splice i, 1
-    @setValue()
-
-  collectionReorder: (ids) ->
-    that = @
-    ordered_collection = []
-    for id, i in ids
-      do (id) ->
-        index = that.indexInCollection(id)
-        val = that.collection[index]
-        val.position = i + 1
-        ordered_collection.push val
-    @collection = ordered_collection
     @setValue()
 
   add: (val) ->
@@ -143,17 +131,30 @@ AutocompleteCollection.prototype =
         $item.remove()
 
   build: ->
-    that = @
-    $.each @collection, (i, val) ->
-      that.draw(val)
+    $.each @collection, (i, val) =>
+      @draw(val)
     @setValue()
-    if $.fn.sortable?
-      @$collection.sortable
-        stop: (e, ui) ->
-          collectionIds = that.$collection.find("[data-autocomplete-collection-id]").map( ->
-            parseInt $(@).attr("data-autocomplete-collection-id")
-          ).get()
-          that.collectionReorder(collectionIds)
+    return if !$.fn.sortable
+    @$collection.sortable
+      stop: $.proxy(@collectionReorder, @)
+
+  collectionReorder: (e, ui) ->
+    orderedCollection = []
+    for li, i in @$collection.children()
+      do (li) =>
+        name = $(li).find(".ac-prop-val").text()
+        items = $.grep @collection, (itm) -> itm.name is name
+        return if !items.length
+        item = items[0]
+        item.position = i + 1
+        orderedCollection.push item
+    orderedCollection.sort (a, b) ->
+      if a.position < b.position
+        -1
+      else
+        if a.position > b.position then 1 else 0
+    @collection = orderedCollection
+    @setValue()
 
   lookup: (event) ->
     that = @
@@ -219,12 +220,12 @@ AutocompleteCollection.prototype =
         item = item[that.options.property]
         i.find('a').html(that.highlighter(item))
         return i[0]
-    items.first().addClass('active')
     @$menu.html(items)
     if @allowNew
-      $addNewLi = $(@options.item)
+      $addNewLi = $(@options.item).prop('data-value', @query)
       $addNewLi.find("a").addClass('add-new icon-plus').html("Add new item")
       @$menu.append $addNewLi
+    @$menu.children().first().addClass('active')
     @
 
   next: (event) ->
