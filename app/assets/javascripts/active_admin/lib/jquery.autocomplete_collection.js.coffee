@@ -39,7 +39,7 @@ AutocompleteCollection.prototype =
     xhr = $.getJSON(url+query)
     xhr.complete (data) =>
       resp = JSON.parse(data.responseText)
-      resp = resp[@resource] or resp[@response+"s"] or resp
+      resp = resp[@resource] or resp[@resource+"s"] or resp
       autocomplete_collection.process(resp)
 
   select: (go) ->
