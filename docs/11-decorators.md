@@ -4,6 +4,11 @@ Active Admin allows you to use the decorator pattern to provide view-specific
 versions of a resource. [Draper](https://github.com/drapergem/draper) is
 recommended but not required.
 
+To use decorator support without Draper, your decorator must support a variety
+of collection methods to support pagination, filtering, etc. See
+[this github issue discussion](https://github.com/activeadmin/activeadmin/issues/3600)
+and [this gem](https://github.com/kiote/activeadmin-poro-decorator) for more details.
+
 ## Example usage
 
 ```ruby
@@ -13,7 +18,7 @@ class Post < ActiveRecord::Base
 end
 
 # app/decorators/post_decorator.rb
-class PostDecorator < ApplicationDecorator
+class PostDecorator < Draper::Decorator
   delegate_all
 
   def image
@@ -35,18 +40,15 @@ end
 
 ## Forms
 
-If you decorate an AA resource, the form will also be decorated.
-
-In most cases this will work as expected, but if your decorator uses the same
-method name as an attribute and it returns a modified version of the attribute's
-value, you'll want to set `decorate: false` to make sure that the population of
-existing values happens correctly:
+By default, ActiveAdmin does *not* decorate the resource used to render forms.
+If you need ActiveAdmin to decorate the forms, you can pass `decorate: true` to the
+form block.
 
 ```ruby
 ActiveAdmin.register Post do
   decorate_with PostDecorator
 
-  form decorate: false do |f|
+  form decorate: true do |f|
     # ...
   end
 end

@@ -15,7 +15,7 @@ module ActiveAdmin
       instance_exec &block if block_given?
     end
 
-    # The instance of ActiveAdmin::Config that's being registered
+    # The instance of ActiveAdmin::Resource that's being registered
     # currently. You can use this within your registration blocks to
     # modify options:
     #
@@ -50,7 +50,7 @@ module ActiveAdmin
     #
     # @param [Module] mod A module to include
     #
-    # @returns [Nil]
+    # @return [Nil]
     def include(mod)
       mod.included(self)
     end
@@ -77,13 +77,21 @@ module ActiveAdmin
 
     # Add a new action item to the resource
     #
+    # @param [Symbol] name
     # @param [Hash] options valid keys include:
     #                 :only:  A single or array of controller actions to display
     #                         this action item on.
     #                 :except: A single or array of controller actions not to
     #                          display this action item on.
-    def action_item(options = {}, &block)
-      config.add_action_item(options, &block)
+    def action_item(name = nil, options = {}, &block)
+      if name.is_a?(Hash)
+        options = name
+        name = nil
+      end
+
+      Deprecation.warn "using `action_item` without a name is deprecated! Use `action_item(:edit)`." unless name
+
+      config.add_action_item(name, options, &block)
     end
 
     # Add a new batch action item to the resource
@@ -100,7 +108,7 @@ module ActiveAdmin
     def batch_action(title, options = {}, &block)
       # Create symbol & title information
       if title.is_a? String
-        sym = title.titleize.gsub(' ', '').underscore.to_sym
+        sym = title.titleize.tr(' ', '').underscore.to_sym
       else
         sym = title
         title = sym.to_s.titleize
@@ -120,7 +128,7 @@ module ActiveAdmin
       config.menu_item_options = options
     end
 
-    # Set the name of the navigation menu to display. This is mainly used in conjuction with the
+    # Set the name of the navigation menu to display. This is mainly used in conjunction with the
     # `#belongs_to` functionality.
     #
     # @param [Symbol] menu_name The name of the menu to display as the global navigation

@@ -9,9 +9,7 @@ ja:
     delete: "削除"
     delete_confirmation: "本当に削除しますか?"
     new_model: "%{model} を作成する"
-    create_model: "%{model} を作成する"
     edit_model: "%{model} を編集する"
-    update_model: "%{model} を更新する"
     delete_model: "%{model} を削除する"
     details: "%{model} の詳細"
     cancel: "取り消す"
@@ -33,6 +31,9 @@ ja:
         ends_with: "で終わる"
         greater_than: "より大きい"
         less_than: "より小さい"
+    status_tag:
+      "yes": "はい"
+      "no": "いいえ"
     main_content: "内容を表示するために %{model}#main_content を実装してください。"
     logout: "ログアウト"
     powered_by: "Powered by %{active_admin} %{version}"
@@ -51,6 +52,8 @@ ja:
     blank_slate:
       content: "%{resource_name} はまだありません。"
       link: "作成する"
+    dropdown_actions:
+      button_label: "操作"
     batch_actions:
       button_label: "一括操作"
       default_confirmation: "本当によろしいですか。"

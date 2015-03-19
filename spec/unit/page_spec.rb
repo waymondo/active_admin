@@ -1,12 +1,12 @@
 # encoding: utf-8
 
-require 'spec_helper'
+require 'rails_helper'
 require File.expand_path('config_shared_examples', File.dirname(__FILE__))
 
 module ActiveAdmin
   describe Page do
 
-    it_should_behave_like "ActiveAdmin::Config"
+    it_should_behave_like "ActiveAdmin::Resource"
     before { load_defaults! }
 
     let(:application){ ActiveAdmin::Application.new }
@@ -53,6 +53,12 @@ module ActiveAdmin
     describe "#camelized_resource_name" do
       it "returns the resource name camel case" do
         expect(config.camelized_resource_name).to eq "ChocolateILoveYou"
+      end
+    end
+
+    describe "#namespace_name" do
+      it "returns the name of the namespace" do
+        expect(config.namespace_name).to eq "admin"
       end
     end
 

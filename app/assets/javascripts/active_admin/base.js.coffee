@@ -3,6 +3,7 @@
 #= require jquery-ui/dialog
 #= require jquery-ui/sortable
 #= require jquery-ui/widget
+#= require jquery-ui/tabs
 #= require jquery_ujs
 #= require ./jquery.migrate
 #= require redactor-rails/redactor
@@ -14,4 +15,3 @@
 #= require ./application
 
 window.ActiveAdmin = {}
-window.AA = window.ActiveAdmin unless window.AA

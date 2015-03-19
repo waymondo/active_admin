@@ -17,7 +17,7 @@ module ActiveAdmin
         namespace = options[:namespace]
         except = options[:except].is_a?(Array) ? options[:except] : [options[:except]]
 
-        params.map do |k, v|
+        params.flat_map do |k, v|
           next if namespace.nil? && %w(controller action commit utf8).include?(k.to_s)
           next if except.map(&:to_s).include?(k.to_s)
 
@@ -31,7 +31,7 @@ module ActiveAdmin
           when Symbol
             { k => v.to_s }
           when Hash
-            fields_for_params(v, :namespace => k)
+            fields_for_params(v, namespace: k)
           when Array
             v.map do |v|
               { "#{k}[]" => v }
@@ -43,7 +43,7 @@ module ActiveAdmin
           else
             raise "I don't know what to do with #{v.class} params: #{v.inspect}"
           end
-        end.flatten.compact
+        end.compact
       end
     end
   end

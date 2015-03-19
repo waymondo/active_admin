@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'rails_helper'
 require 'fileutils'
 
 describe ActiveAdmin::Application do
@@ -16,10 +16,6 @@ describe ActiveAdmin::Application do
 
   it "should remove app/admin from the autoload paths (Active Admin deals with loading)" do
     expect(ActiveSupport::Dependencies.autoload_paths).to_not include(File.join(Rails.root, "app/admin"))
-  end
-
-  it "should add app/admin to the Engine's watchable directories (loaded after the app itself)" do
-    expect(ActiveAdmin::Engine.config.watchable_dirs).to have_key File.join(Rails.root, "app/admin")
   end
 
   it "should store the site's title" do
@@ -63,7 +59,7 @@ describe ActiveAdmin::Application do
   end
 
   it "should allow comments by default" do
-    expect(application.allow_comments).to eq true
+    expect(application.comments).to eq true
   end
 
   describe "authentication settings" do
@@ -121,10 +117,10 @@ describe ActiveAdmin::Application do
     end
 
     it "should not pollute the global app" do
-      expect(application.namespaces.keys).to be_empty
+      expect(application.namespaces).to be_empty
       application.namespace(:brand_new_ns)
-      expect(application.namespaces.keys).to eq [:brand_new_ns]
-      expect(ActiveAdmin.application.namespaces.keys).to eq [:admin]
+      expect(application.namespaces.names).to eq [:brand_new_ns]
+      expect(ActiveAdmin.application.namespaces.names).to eq [:admin]
     end
   end
 
@@ -132,8 +128,8 @@ describe ActiveAdmin::Application do
     it "finds or create the namespace and register the page to it" do
       namespace = double
       expect(application).to receive(:namespace).with("public").and_return namespace
-      expect(namespace).to receive(:register_page).with("My Page", {:namespace => "public"})
-      application.register_page("My Page", :namespace => "public")
+      expect(namespace).to receive(:register_page).with("My Page", {namespace: "public"})
+      application.register_page("My Page", namespace: "public")
     end
   end
 

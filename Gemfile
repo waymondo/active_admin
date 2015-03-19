@@ -2,17 +2,23 @@ source 'https://rubygems.org'
 
 gemspec
 
-ACTIVE_ADMIN_PATH = File.dirname(__FILE__) unless defined?(ACTIVE_ADMIN_PATH)
-
-require File.expand_path('spec/support/detect_rails_version', ACTIVE_ADMIN_PATH)
+require File.expand_path 'spec/support/detect_rails_version', File.dirname(__FILE__)
 
 rails_version = detect_rails_version
 gem 'rails', rails_version
 
-gem 'arbre', github: 'gregbell/arbre' # until gregbell/arbre#16 makes it into an official release
+# Optional dependencies
+gem 'cancan'
+gem 'devise'
+gem 'draper'
+gem 'pundit'
 
+# Utility gems used in both development & test environments
 gem 'rake', require: false
-gem 'rails-i18n' # Provides default i18n for many languages
+gem 'parallel_tests'
+
+# Debugging
+gem 'pry'                  # Easily debug from your console with `binding.pry`
 
 group :development do
   # Debugging
@@ -25,24 +31,24 @@ group :development do
 
   # Documentation
   gem 'yard'               # Documentation generator
-  gem 'yard-redcarpet-ext' # Enables Markdown tables, which are disabled by default
   gem 'redcarpet'          # Markdown implementation (for yard)
 end
 
 group :test do
-  gem 'cancan'
-  gem 'capybara', '= 1.1.2'
+  gem 'capybara'
   gem 'simplecov', require: false # Test coverage generator. Go to /coverage/ after running tests
   gem 'coveralls', require: false # Test coverage website. Go to https://coveralls.io
-  # Move to next stable version including: https://github.com/cucumber/cucumber-rails/pull/253
-  gem 'cucumber-rails', github: 'cucumber/cucumber-rails', require: false
+  gem 'cucumber-rails', require: false
   gem 'database_cleaner'
   gem 'guard-rspec'
   gem 'jasmine'
   gem 'jslint_on_rails'
   gem 'launchy'
-  gem 'parallel_tests'
-  gem 'rspec-rails'
+  gem 'rails-i18n' # Provides default i18n for many languages
+  gem 'rspec'
+  gem 'rspec-rails', '~> 3.1.0'
+  gem 'i18n-spec'
   gem 'shoulda-matchers'
   gem 'sqlite3'
+  gem 'poltergeist'
 end

@@ -49,6 +49,18 @@ end
 
 See the [Menu](2-resource-customization.md#customize-the-menu) documentation.
 
+## Customize the Namespace
+
+We use the `admin` namespace by default, but you can use anything:
+
+```ruby
+# Available at /today/calendar
+ActiveAdmin.register_page "Calendar", namespace: :today
+
+# Available at /calendar
+ActiveAdmin.register_page "Calendar", namespace: false
+```
+
 ## Add a Sidebar
 
 See the [Sidebars](7-sidebars.md) documentation.
@@ -59,7 +71,7 @@ Just like other resources, you can add action items. The difference here being t
 `:only` and `:except` don't apply because there's only one page it could apply to.
 
 ```ruby
-action_item do
+action_item :view_site do
   link_to "View Site", "/"
 end
 ```
@@ -74,7 +86,7 @@ page_action :add_event, method: :post do
   redirect_to admin_calendar_path, notice: "Your event was added"
 end
 
-action_item do
+action_item :add do
   link_to "Add Event", admin_calendar_add_event_path, method: :post
 end
 ```

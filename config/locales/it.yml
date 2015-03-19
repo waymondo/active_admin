@@ -9,9 +9,7 @@ it:
     delete: "Rimuovi"
     delete_confirmation: "Sei sicuro di volerlo rimuovere?"
     new_model: "Aggiungi %{model}"
-    create_model: "Aggiungi %{model}"
     edit_model: "Modifica %{model}"
-    update_model: "Modifica %{model}"
     delete_model: "Rimuovi %{model}"
     details: "Dettagli %{model}"
     cancel: "Annulla"
@@ -33,6 +31,9 @@ it:
         ends_with: "Finisce con"
         greater_than: "Maggiore di"
         less_than: "Minore di"
+    status_tag:
+      "yes": "Sì"
+      "no": "No"
     main_content: "Devi implemetare %{model}#main_content per mostrarne il contenuto."
     logout: "Esci"
     powered_by: "Powered by %{active_admin} %{version}"
@@ -51,6 +52,8 @@ it:
     blank_slate:
       content: "Non sono presenti %{resource_name}"
       link: "Crea nuovo/a"
+    dropdown_actions:
+      button_label: "Azioni"
     batch_actions:
       button_label: "Azioni multiple"
       default_confirmation: "Sei sicuro di che voler fare questo?"
@@ -98,6 +101,9 @@ it:
       unlock:
         title: "Invia di nuovo le istruzioni per sbloccare"
         submit: "Invia di nuovo le istruzioni per sbloccare"
+      resend_confirmation_instructions:
+        title: "Invia di nuovo le istruzioni per la conferma"
+        submit: "Invia di nuovo le istruzioni per la conferma"
       links:
         sign_in: "Entra"
         forgot_your_password: "Dimenticato la password?"

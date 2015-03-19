@@ -2,12 +2,12 @@ module ActiveAdmin
   module Callbacks
     extend ActiveSupport::Concern
 
-    protected
+    private
 
     # Simple callback system. Implements before and after callbacks for
     # use within the controllers.
     #
-    # We didn't use the ActiveSupport callbacks becuase they do not support
+    # We didn't use the ActiveSupport callbacks because they do not support
     # passing in any arbitrary object into the callback method (which we
     # need to do)
 
@@ -23,6 +23,8 @@ module ActiveAdmin
     end
 
     module ClassMethods
+
+      private
 
       # Define a new callback.
       #
@@ -63,6 +65,7 @@ module ActiveAdmin
             singleton_class.send :define_method, callback_name do
               instance_variable_get(callback_ivar) || instance_variable_set(callback_ivar, [])
             end
+            singleton_class.send :private, callback_name
 
             # def self.before_create
             singleton_class.send :define_method, "#{type}_#{name}" do |method = nil, &block|
@@ -77,6 +80,7 @@ module ActiveAdmin
             self.class.send("after_#{name}_callbacks").each { |cbk| run_callback(cbk, *args) }
             return value
           end
+          send :private, "run_#{name}_callbacks"
         end
       end
     end

@@ -9,9 +9,7 @@ pt-BR:
     delete: "Remover"
     delete_confirmation: "Você tem certeza que deseja remover este item?"
     new_model: "Novo(a) %{model}"
-    create_model: "Novo(a) %{model}"
     edit_model: "Editar %{model}"
-    update_model: "Atualizar %{model}"
     delete_model: "Remover %{model}"
     details: "Detalhes do(a) %{model}"
     cancel: "Cancelar"
@@ -33,6 +31,9 @@ pt-BR:
         ends_with: "Termina com"
         greater_than: "Maior Que"
         less_than: "Menor Que"
+    status_tag:
+      "yes": "Sim"
+      "no": "Não"
     main_content: "Por favor implemente %{model}#main_content para exibir conteúdo."
     logout: "Sair"
     powered_by: "Powered by %{active_admin} %{version}"
@@ -51,6 +52,8 @@ pt-BR:
     blank_slate:
       content: "Não existem %{resource_name} ainda."
       link: "Novo"
+    dropdown_actions:
+      button_label: "Ações"
     batch_actions:
       button_label: "Ações em lote"
       default_confirmation: "Tem certeza que quer fazer isso?"
@@ -62,7 +65,7 @@ pt-BR:
       link: "Novo"
       action_label: "%{title} Selecionado"
       labels:
-        destroy: "Excluído"
+        destroy: "Excluir"
     comments:
       resource_type: "Tipo de Objeto"
       author_type: "Tipo de Autor"
@@ -85,6 +88,9 @@ pt-BR:
         title: "Subdomínio"
       password:
         title: "Senha"
+      sign_up:
+        title: "Cadastre-se"
+        submit: "Continuar"
       login:
         title: "Conta"
         remember_me: "Lembrar da senha"
@@ -98,10 +104,14 @@ pt-BR:
       unlock:
         title: "Reenviar instruções de desbloqueio"
         submit: "Reenviar instruções de desbloqueio"
+      resend_confirmation_instructions:
+        title: "Reenviar instruções de confirmação"
+        submit: "Reenviar instruções de confirmação"
       links:
         sign_in: "Entrar"
         forgot_your_password: "Esqueceu sua senha?"
         sign_in_with_omniauth_provider: "Entre com o %{provider}"
+        resend_unlock_instructions: "Reenviar instruções de desbloqueio"
     access_denied:
       message: "Você não tem permissão para realizar o solicitado"
     index_list:

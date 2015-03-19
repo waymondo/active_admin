@@ -11,7 +11,7 @@ module ActiveAdmin
   #
   # For example:
   #
-  #   ActiveAdmin.register Post, :namespace => :admin
+  #   ActiveAdmin.register Post, namespace: :admin
   #
   # Will register the Post model into the "admin" namespace. This will namespace the
   # urls for the resource to "/admin/posts" and will set the controller to
@@ -19,7 +19,7 @@ module ActiveAdmin
   #
   # You can also register to the "root" namespace, which is to say no namespace at all.
   #
-  #   ActiveAdmin.register Post, :namespace => false
+  #   ActiveAdmin.register Post, namespace: false
   #
   # This will register the resource to an instantiated namespace called :root. The
   # resource will be accessible from "/posts" and the controller will be PostsController.
@@ -96,7 +96,7 @@ module ActiveAdmin
     # Override from ActiveAdmin::Settings to inherit default attributes
     # from the application
     def read_default_setting(name)
-      application.send(name)
+      application.public_send name
     end
 
     def fetch_menu(name)
@@ -112,7 +112,7 @@ module ActiveAdmin
     # @param [Symbol] name The name of the menu. Default: :default
     # @param [Proc] block The block to be ran when the menu is built
     #
-    # @returns [void]
+    # @return [void]
     def build_menu(name = DEFAULT_MENU, &block)
       @menus.before_build do |menus|
         menus.menu name do |menu|
@@ -146,8 +146,8 @@ module ActiveAdmin
     def add_current_user_to_menu(menu, priority = 10, html_options = {})
       if current_user_method
         menu.add id: 'current_user', priority: priority, html_options: html_options,
-          label: ->{ display_name current_active_admin_user },
-          url:   ->{ auto_url_for(current_active_admin_user) || '#' },
+          label: -> { display_name current_active_admin_user },
+          url:   -> { auto_url_for(current_active_admin_user) },
           if:    :current_active_admin_user?
       end
     end
@@ -242,5 +242,21 @@ module ActiveAdmin
       PageDSL.new(config).run_registration_block(&block)
     end
 
+    class Store
+      include Enumerable
+      delegate :[], :[]=, :empty?, to: :@namespaces
+
+      def initialize
+        @namespaces = {}
+      end
+
+      def each(&block)
+        @namespaces.values.each(&block)
+      end
+
+      def names
+        @namespaces.keys
+      end
+    end
   end
 end

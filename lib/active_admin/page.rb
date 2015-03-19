@@ -1,7 +1,7 @@
 module ActiveAdmin
   # Page is the primary data storage for page configuration in Active Admin
   #
-  # When you register a page (ActiveAdmin.page "Status") you are actually creating
+  # When you register a page (ActiveAdmin.register_page "Status") you are actually creating
   # a new Page instance within the given Namespace.
   #
   # The instance of the current page is available in PageController and views
@@ -56,8 +56,12 @@ module ActiveAdmin
       underscored_resource_name.camelize
     end
 
+    def namespace_name
+      namespace.name.to_s
+    end
+
     def default_menu_options
-      super.merge(:id => resource_name)
+      super.merge(id: resource_name)
     end
 
     def controller_name
