@@ -22,11 +22,7 @@
   @listen()
 
 AutocompleteCollection.prototype =
-
   constructor: AutocompleteCollection
-
-  # collection: ->
-  #   JSON.parse(@$element.attr('data-collection')) or []
 
   collectionIds: ->
     $.map @collection, (o) -> o.id
@@ -243,7 +239,7 @@ AutocompleteCollection.prototype =
 
   listen: ->
     @$element
-      .on("focus", $.proxy(@focus, @))
+      .on("focus",    $.proxy(@focus, @))
       .on('blur',     $.proxy(@blur, @))
       .on('keypress', $.proxy(@keypress, @))
       .on('keyup',    $.proxy(@keyup, @))
@@ -256,7 +252,11 @@ AutocompleteCollection.prototype =
       .on("mouseleave", "li", $.proxy(@mouseleave, @))
 
   move: (e) ->
-    return if !@shown
+    if !@shown
+      if e.keyCode == 13
+        return false
+      else
+        return
     switch e.keyCode
       when 9, 13, 27
         e.preventDefault()
@@ -288,8 +288,12 @@ AutocompleteCollection.prototype =
         @select()
         break
       when 13 # enter
-        return if !@shown
-        @select(true)
+        if !@shown
+          @onenter(e) if typeof @onenter == "function"
+          @select() if @allowNew
+        else
+          @select()
+        break
       when 27 # escape
         return if !@shown
         @hide()
@@ -298,22 +302,6 @@ AutocompleteCollection.prototype =
         @lookup()
     e.stopPropagation()
     e.preventDefault()
-
-  keypress: (e) ->
-    e.stopPropagation()
-    return unless @shown
-    switch e.keyCode
-      when 9, 13, 27 # tab / enter / escape
-        e.preventDefault()
-        break
-      when 38 # up arrow
-        e.preventDefault()
-        @prev()
-        break
-      when 40 # down arrow
-        e.preventDefault()
-        @next()
-        break
 
   focus: (e) ->
     @focused = true

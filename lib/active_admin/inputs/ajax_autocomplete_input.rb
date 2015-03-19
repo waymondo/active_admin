@@ -4,15 +4,15 @@ module ActiveAdmin
 
       def input_html_options
         options = super
-        options[:class] = [options[:class], "ajax-autocomplete"].compact.join(' ')
-        options[:value] = ""
+        options[:class] = [options[:class], 'ajax-autocomplete'].compact.join(' ')
+        options[:value] = ''
         options[:placeholder] = "Search for #{method.to_s}"
-        # options[:multiple] = true
-        options[:data] = options[:data] || Hash.new
+        options[:autocomplete] = 'off'
+        options[:data] = options[:data] || {}
         options[:data][:method] = method.to_s
         options[:data][:collection] = options[:data][:collection] || collection_as_json
         options[:data][:json_url] = options[:data][:json_url] || json_url
-        options[:data][:provide] = "autocomplete-collection"
+        options[:data][:provide] = 'autocomplete-collection'
         # options[:name] = input_html_name
         options
       end
@@ -37,9 +37,8 @@ module ActiveAdmin
       end
 
       def json_url
-        "/admin/#{reflection_for(method).plural_name}?q%5B#{search_scope.to_s}%5D="
+        "/admin/#{reflection_for(method).plural_name}?q%5B#{search_scope}%5D="
       end
-
     end
   end
 end
