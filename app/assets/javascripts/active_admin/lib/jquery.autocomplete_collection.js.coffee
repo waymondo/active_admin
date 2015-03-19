@@ -167,23 +167,13 @@ AutocompleteCollection.prototype =
         @process(@source)
 
   process: (results) ->
-    that = this
-    if results.length and typeof results[0] != "string"
-      @strings = false
+    @strings = false if results.length and typeof results[0] isnt "string"
     @query = @$element.val()
-    if !@query
-      if @shown then @hide() else this
-
-    items = $.grep results, (item) ->
-      if !that.strings
-        item = item[that.options.property]
-      if that.matcher(item)
-        return item
-
-    # items = @sorter(items)
-    if !items.length and !@allowNew
-      return if @shown then @hide() else @
-
+    return @hide() if !@query and typeof @source is "function"
+    items = @sorter $.grep results, (item) =>
+      item = item[@options.property] unless @strings
+      item if @matcher(item)
+    return @hide() if !items.length and !@options.otherOption
     @render(items.slice(0, @options.items)).show()
 
   matcher: (item) ->
@@ -193,20 +183,20 @@ AutocompleteCollection.prototype =
     beginswith = []
     caseSensitive = []
     caseInsensitive = []
-
+    item = undefined
+    sortby = undefined
     while item = items.shift()
       if @strings
         sortby = item
       else
         sortby = item[@options.property]
-      if !sortby.toLowerCase().indexOf(@query.toLowerCase())
-        beginswith.push(item)
+      unless sortby.toLowerCase().indexOf(@query.toLowerCase())
+        beginswith.push item
       else if ~sortby.indexOf(@query)
-        caseSensitive.push(item)
+        caseSensitive.push item
       else
-        caseInsensitive.push(item)
-
-    beginswith.concat(caseSensitive, caseInsensitive)
+        caseInsensitive.push item
+    beginswith.concat caseSensitive, caseInsensitive
 
   highlighter: (item) ->
     item.replace new RegExp('(' + @query + ')', 'ig'), ($1, match) ->
@@ -244,27 +234,29 @@ AutocompleteCollection.prototype =
     prev.addClass('active')
     @
 
+  eventSupported: (eventName) ->
+    isSupported = eventName of @$element
+    unless isSupported
+      @$element.setAttribute eventName, "return;"
+      isSupported = typeof @$element[eventName] is "function"
+    isSupported
+
   listen: ->
     @$element
+      .on("focus", $.proxy(@focus, @))
       .on('blur',     $.proxy(@blur, @))
       .on('keypress', $.proxy(@keypress, @))
       .on('keyup',    $.proxy(@keyup, @))
 
-    if $.browser.webkit or $.browser.msie
-      @$element.on('keydown', $.proxy(@keypress, @))
+    @$element.on "keydown", $.proxy(@keypress, @) if @eventSupported("keydown")
 
     @$menu
       .on('click', $.proxy(@click, @))
       .on('mouseenter', 'li', $.proxy(@mouseenter, @))
-
+      .on("mouseleave", "li", $.proxy(@mouseleave, @))
 
   move: (e) ->
-    if !@shown
-      if e.keyCode == 13
-        return false
-      else
-        return
-
+    return if !@shown
     switch e.keyCode
       when 9, 13, 27
         e.preventDefault()
@@ -277,7 +269,6 @@ AutocompleteCollection.prototype =
         e.preventDefault()
         @next()
         break
-
     e.stopPropagation()
 
   keydown: (e) ->
@@ -289,47 +280,55 @@ AutocompleteCollection.prototype =
     @move(e)
 
   keyup: (e) ->
-
     switch e.keyCode
-      when 40, 38 # down / up arrow
+      when 40, 38, 16, 17, 18, 91, 16 # down / up arrow
         break
       when 9 # tab
-        return if !@shown
+        return if !@shown or !@query
         @select()
-      when 13 # enter
-        if !@shown
-          @onenter(e) if typeof @onenter == "function"
-          @select() if @allowNew
-        else
-          @select()
         break
+      when 13 # enter
+        return if !@shown
+        @select(true)
       when 27 # escape
         return if !@shown
         @hide()
         break
       else
         @lookup()
-
     e.stopPropagation()
     e.preventDefault()
+
+  keypress: (e) ->
+    e.stopPropagation()
+    return unless @shown
+    switch e.keyCode
+      when 9, 13, 27 # tab / enter / escape
+        e.preventDefault()
+        break
+      when 38 # up arrow
+        e.preventDefault()
+        @prev()
+        break
+      when 40 # down arrow
+        e.preventDefault()
+        @next()
+        break
 
   focus: (e) ->
     @focused = true
+    setTimeout =>
+      @lookup()
+    , 100 if typeof @source isnt "function"
 
   blur: (e) ->
     @focused = false
-    that = @
-    e.stopPropagation()
-    e.preventDefault()
-    setTimeout ->
-      that.hide()
-    , 150
+    @hide() if not @mousedover and @shown
 
   click: (e) ->
     e.stopPropagation()
     e.preventDefault()
     @select(true)
-    @$element.focus()
 
   mouseenter: (e) ->
     @mousedover = true
@@ -338,8 +337,7 @@ AutocompleteCollection.prototype =
 
   mouseleave: (e) ->
     @mousedover = false
-    @hide() if !@focused and @shown
-
+    @hide() if not @focused and @shown
 
 $.fn.autocomplete_collection = (option) ->
   @each ->
@@ -364,7 +362,6 @@ $.fn.autocomplete_collection.defaults =
 $.fn.autocomplete_collection.Constructor = AutocompleteCollection
 
 $ ->
-
   $('[data-provide="autocomplete-collection"]').each ->
     $this = $(@)
     return if $this.data('autocomplete-collection')
