@@ -12,6 +12,7 @@ $(document).ready(
         "fileUpload":"/redactor_rails/documents?" + params,
         "fileGetJson":"/redactor_rails/documents",
         "deniedTags":['html', 'head', 'link', 'body', 'meta'],
+        "buttonSource": true,
         "wym": true,
         "path":"/assets/redactor-rails",
         "css":"style.css"}
