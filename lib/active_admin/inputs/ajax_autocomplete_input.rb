@@ -6,7 +6,7 @@ module ActiveAdmin
         options = super
         options[:class] = [options[:class], 'ajax-autocomplete'].compact.join(' ')
         options[:value] = ''
-        options[:placeholder] = "Search for #{method.to_s}"
+        options[:placeholder] = "Search for #{method.to_s.split('_id')[0]}"
         options[:autocomplete] = 'off'
         options[:data] = options[:data] || {}
         options[:data][:method] = method.to_s
@@ -33,7 +33,8 @@ module ActiveAdmin
       end
 
       def collection_as_json
-        @object.send(method).map{|o| { id: o.id, name: o.name }}.to_json
+        array = @object.send(method) || []
+        array.map { |o| { id: o.id, name: o.name } }.to_json
       end
 
       def json_url

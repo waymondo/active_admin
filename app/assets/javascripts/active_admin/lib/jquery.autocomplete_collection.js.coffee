@@ -1,6 +1,7 @@
 @AutocompleteCollection = (element, options) ->
   @options = $.extend({}, $.fn.autocomplete_collection.defaults, options)
   @resource = @options.resource or @options.method
+  @single = @options.single
   @$element = $(element)
   @$element.wrap $(document.createElement('div')).addClass('autocomplete-collection-wrap')
   @$hidden = @$element.clone().attr('type','hidden').insertAfter(@$element)
@@ -101,7 +102,10 @@ AutocompleteCollection.prototype =
 
   setValue: ->
     @$element.data('collection', @collection)
-    @$hidden.val JSON.stringify @collection
+    if @single
+      @$hidden.val @collection[0]?.id
+    else
+      @$hidden.val JSON.stringify @collection
 
   collectionAdd: (val) ->
     @collection.push(val)
@@ -113,8 +117,14 @@ AutocompleteCollection.prototype =
 
   add: (val) ->
     if i = @indexInCollection(val.id) == -1
-      @draw(val)
-      @collectionAdd(val)
+      if @single
+        @$collection.empty()
+        @draw(val)
+        @collection = [val]
+        @setValue()
+      else
+        @draw(val)
+        @collectionAdd(val)
 
   remove: (val) ->
     if (i = @indexInCollection(val.id)) > -1
