@@ -18,7 +18,7 @@ module ActiveAdmin
       end
 
       # Returns the filters for this resource. If filters are not enabled,
-      # it will always return an empty array.
+      # it will always return an empty hash.
       #
       # @return [Hash] Filters that apply for this resource
       def filters
@@ -163,14 +163,14 @@ module ActiveAdmin
           active = ActiveAdmin::Filters::Active.new(resource_class, params)
 
           span do
-            h4 "Scope:", style: 'display: inline'
+            h4 I18n.t("active_admin.search_status.headline"), style: 'display: inline'
             b active.scope, style: "display: inline"
 
             div style: "margin-top: 10px" do
-              h4 "Current filters:", style: 'margin-bottom: 10px'
+              h4 I18n.t("active_admin.search_status.current_filters"), style: 'margin-bottom: 10px'
               ul do
                 if active.filters.blank?
-                  li "None"
+                  li I18n.t("active_admin.search_status.no_current_filters")
                 else
                   active.filters.each do |filter|
                     li do

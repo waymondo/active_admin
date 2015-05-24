@@ -40,6 +40,12 @@ module ActiveAdmin
     # Set a favicon
     inheritable_setting :favicon, false
 
+    # Additional meta tags to place in head of logged in pages.
+    inheritable_setting :meta_tags, {}
+
+    # Additional meta tags to place in head of logged out pages.
+    inheritable_setting :meta_tags_for_logged_out_pages, { robots: "noindex, nofollow" }
+
     # The view factory to use to generate all the view classes. Take
     # a look at ActiveAdmin::ViewFactory
     inheritable_setting :view_factory, ActiveAdmin::ViewFactory.new
@@ -216,7 +222,8 @@ module ActiveAdmin
     # Example usage:
     #   ActiveAdmin.before_filter :authenticate_admin!
     #
-    %w(before_filter skip_before_filter after_filter skip_after_filter around_filter skip_filter).each do |name|
+    AbstractController::Callbacks::ClassMethods.public_instance_methods.
+      select { |m| m.match(/(filter|action)/) }.each do |name|
       define_method name do |*args, &block|
         controllers_for_filters.each do |controller|
           controller.public_send name, *args, &block
