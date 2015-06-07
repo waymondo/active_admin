@@ -7,6 +7,7 @@
 #= require jquery_ujs
 #= require ./jquery.migrate
 #= require redactor-rails/redactor
+#= require ./redactor-rails/video
 #= require ./redactor-rails/config
 #
 #= require_self
