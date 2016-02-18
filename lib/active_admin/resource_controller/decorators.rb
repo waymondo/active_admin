@@ -28,7 +28,7 @@ module ActiveAdmin
 
       def decorate?
         case action_name
-        when 'new', 'edit'
+        when 'new', 'edit', 'create', 'update'
           form = active_admin_config.get_page_presenter :form
           form && form.options[:decorate] && decorator_class.present?
         else
@@ -68,7 +68,7 @@ module ActiveAdmin
           ::Class.new parent do
             delegate :reorder, :page, :current_page, :total_pages, :limit_value,
                      :total_count, :num_pages, :to_key, :group_values, :except,
-                     :find_each
+                     :find_each, :ransack
 
             define_singleton_method(:name) { name }
           end

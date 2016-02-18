@@ -1,5 +1,5 @@
 ActiveAdmin.register <%= class_name %> do
-<% if Rails::VERSION::MAJOR == 4 || defined?(ActionController::StrongParameters) %>
+<% if ActiveAdmin::Dependency.rails.strong_parameters? %>
 # See permitted parameters documentation:
 # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
 #
@@ -9,7 +9,7 @@ ActiveAdmin.register <%= class_name %> do
 #
 # permit_params do
 #   permitted = [:permitted, :attributes]
-#   permitted << :other if resource.something?
+#   permitted << :other if params[:action] == 'create' && current_user.admin?
 #   permitted
 # end
 <% end %>
@@ -35,5 +35,11 @@ ActiveAdmin.register <%= class_name %> do
 # end
 
 # Add or remove fields to toggle their visibility in the form
+# form do |f|
+#   f.inputs do
+<%= @boilerplate.form_inputs %>
+#   end
+#   f.actions
+# end
 <% end %>
 end

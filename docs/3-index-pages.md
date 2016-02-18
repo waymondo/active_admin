@@ -152,6 +152,13 @@ preserve_default_filters!
 filter :author
 ```
 
+Or you can also remove a filter and still preserve the default filters:
+
+```ruby
+preserve_default_filters!
+remove_filter :id
+```
+
 ## Index Scopes
 
 You can define custom scopes for your index page. This will add a tab bar above
@@ -211,7 +218,7 @@ You can change it per request / action too:
 
 ```ruby
 controller do
-  before_filter :only => :index do
+  before_action only: :index do
     @per_page = 100
   end
 end

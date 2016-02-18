@@ -32,7 +32,8 @@ de:
         greater_than: "Größer als"
         less_than: "Kleiner als"
     search_status:
-      headline: "Anwendungsbereich:"
+      headline: "Filter"
+      current_scope: "Anwendungsbereich:"
       current_filters: "Aktuelle Filter:"
       no_current_filters: "Keine"
     status_tag:
@@ -78,6 +79,8 @@ de:
       author: "Autor"
       title: "Kommentar"
       add: "Kommentar hinzufügen"
+      delete: "Löschen"
+      delete_confirmation: "Sind Sie sicher dass sie diesen Kommentar löschen wollen?"
       resource: "Res­sour­ce"
       no_comments_yet: "Es gibt noch keine Kommentare."
       author_missing: "Unbekannt"

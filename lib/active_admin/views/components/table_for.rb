@@ -116,10 +116,8 @@ module ActiveAdmin
       end
 
       def is_boolean?(data, item)
-        if item.respond_to? :has_attribute?
-          item.has_attribute?(data) &&
-            item.column_for_attribute(data) &&
-            item.column_for_attribute(data).type == :boolean
+        if item.class.respond_to? :columns_hash
+          column = item.class.columns_hash[data.to_s] and column.type == :boolean
         end
       end
 
@@ -166,7 +164,7 @@ module ActiveAdmin
           if @options.has_key?(:class)
             html_classes << @options.delete(:class)
           elsif @title.present?
-            html_classes << "col-#{@title.to_s.parameterize('_')}"
+            html_classes << "col-#{ActiveAdmin::Dependency.rails.parameterize(@title.to_s)}"
           end
           @html_class = html_classes.join(' ')
           @data = args[1] || args[0]

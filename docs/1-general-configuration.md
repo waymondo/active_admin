@@ -48,6 +48,15 @@ to your application's `config/locales` folder and update it. We welcome new/upda
 so feel free to [contribute](https://github.com/activeadmin/activeadmin/blob/master/CONTRIBUTING.md)!
 To translate third party gems like devise, use for example devise-i18n.
 
+## Localize Format For Dates and Times
+
+Active Admin sets `:long` as default localize format for dates and times.
+If you want, you can customize it.
+
+```ruby
+config.localize_format = :short
+```
+
 ## Namespaces
 
 When registering resources in Active Admin, they are loaded into a namespace.
@@ -118,6 +127,28 @@ end
 ActiveAdmin.register Post do
   config.comments = false
 end
+```
+
+You can change the name under which comments are registered:
+
+```ruby
+config.comments_registration_name = 'AdminComment'
+```
+
+You can change the order for the comments and you can change the column to be
+used for ordering:
+```ruby
+config.comments_order = 'created_at ASC'
+```
+
+You can disable the menu item for the comments index page:
+```ruby
+config.comments_menu = false
+```
+
+You can customize the comment menu:
+```ruby
+config.comments_menu = { parent: 'Admin', priority: 1 }
 ```
 
 ## Utility Navigation

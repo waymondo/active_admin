@@ -32,7 +32,8 @@ es:
         greater_than: "Mayor que"
         less_than: "Menor que"
     search_status:
-      headline: "Alcance:"
+      headline: "Estado de la búsqueda:"
+      current_scope: "Alcance:"
       current_filters: "Filtros actuales:"
       no_current_filters: "Ninguno"
     status_tag:
@@ -72,12 +73,15 @@ es:
       labels:
         destroy: "Borrar"
     comments:
+      created_at: "Fecha de creación"
       resource_type: "Tipo de recurso"
       author_type: "Tipo de autor"
       body: "Cuerpo"
       author: "Autor"
       title: "Comentario"
       add: "Comentar"
+      delete: "Borrar Comentario"
+      delete_confirmation: "¿Está seguro que desea borrar este comentario?"
       resource: "Recurso"
       no_comments_yet: "No hay comentarios aún."
       author_missing: "Anónimo"

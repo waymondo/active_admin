@@ -81,7 +81,12 @@ ActionController::Base.allow_rescue = false
 # after each scenario, which can lead to hard-to-debug failures in
 # subsequent scenarios. If you do this, we recommend you create a Before
 # block that will explicitly put your database in a known state.
-Cucumber::Rails::World.use_transactional_fixtures = false
+if ActiveAdmin::Dependency.rails5?
+  Cucumber::Rails::World.use_transactional_tests = true
+else
+  Cucumber::Rails::World.use_transactional_fixtures = true
+end
+
 # How to clean your database when transactions are turned off. See
 # http://github.com/bmabey/database_cleaner for more info.
 if defined?(ActiveRecord::Base)
@@ -106,7 +111,6 @@ After do
 end
 
 Before do
-
   begin
     # We are caching classes, but need to manually clear references to
     # the controllers. If they aren't clear, the router stores references
@@ -119,6 +123,15 @@ Before do
     p $!
     raise $!
   end
+end
+
+# Force deprecations to raise an exception.
+# This would set `behavior = :raise`, but that wasn't added until Rails 4.
+ActiveSupport::Deprecation.behavior = -> message, callstack do
+  e = StandardError.new message
+  e.set_backtrace callstack.map(&:to_s)
+  puts e # sometimes Cucumber otherwise won't show the error message
+  raise e
 end
 
 # improve the performance of the specs suite by not logging anything

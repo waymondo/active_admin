@@ -25,14 +25,14 @@ end
 Then(/^I should( not)? have parameter "([^"]*)"( with value "([^"]*)")?$/) do |negative, key, compare_val, value|
   query = URI(page.current_url).query
   if query.nil?
-    expect(negative).to be_truthy
+    expect(negative).to eq true
   else
     params = Rack::Utils.parse_query query
     if compare_val
       expect(params[key]).to_not eq value if negative
       expect(params[key]).to eq value unless negative
     else
-      expect(params[key]).to be_nil if negative
+      expect(params[key]).to eq nil if negative
       expect(params[key]).to be_present unless negative
     end
   end

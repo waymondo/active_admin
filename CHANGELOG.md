@@ -6,7 +6,8 @@
 * Rename `allow_comments` to `comments` for more consistent naming [#3695][] by [@pranas][]
 * JavaScript `window.AA` has been removed, use `window.ActiveAdmin` [#3606][] by [@timoschilling][]
 * `f.form_buffers` has been removed [#3486][] by [@varyonic][]
-* iconic has been removed [#3553][] by [@timoschilling][]
+* Iconic has been removed [#3553][] by [@timoschilling][]
+* `config.show_comments_in_menu` has been removed [#4187][] by [@drn][]
 
 ### Enhancements
 
@@ -18,6 +19,8 @@
 
 #### Minor
 
+* Stream CSV downloads as they're generated [#3038][] by [@craigmcnamara][]
+  * Disable streaming in development for easier debugging [#3535][] by [@seanlinsley][]
 * Improved code reloading [#3783][] by [@chancancode][]
 * Do not auto link to inaccessible actions [#3686][] by [@pranas][]
 * Allow to enable comments on per-resource basis [#3695][] by [@pranas][]
@@ -43,6 +46,7 @@
 ```ruby
 index download_links: ->{ can?(:view_all_download_links) || [:pdf] }
 ```
+* Comments menu can be customized via configuration passed to `config.comments_menu` [#4187][] by [@drn][]
 
 ### Security Fixes
 
@@ -55,6 +59,20 @@ index download_links: ->{ can?(:view_all_download_links) || [:pdf] }
 * "New" action item now only shows up on the index page bf659bc by [@seanlinsley][]
 * Fixes comment creation bug with aliased resources 9a082486 by [@seanlinsley][]
 * Fixes the deletion of `:if` and `:unless` from filters [#2523][] by [@PChambino][]
+
+### Deprecations
+
+* `ActiveAdmin::Event` (`ActiveAdmin::EventDispatcher`) [#3435][] by [@timoschilling][]
+  `ActiveAdmin::Event` will be removed in a future version, ActiveAdmin switched
+  to use `ActiveSupport::Notifications`.
+  NOTE: The blog parameters has changed:
+```ruby
+ActiveSupport::Notifications.subscribe ActiveAdmin::Application::BeforeLoadEvent do |event, *args|
+  # some code
+end
+
+ActiveSupport::Notifications.publish ActiveAdmin::Application::BeforeLoadEvent, "some data"
+```
 
 ## Previous Changes
 

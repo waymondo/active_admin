@@ -107,7 +107,11 @@ module ActiveAdmin
 
       # @return [Array] The array of default filters for this resource
       def default_filters
-        default_association_filters + default_content_filters + custom_ransack_filters
+        result = []
+        result.concat default_association_filters if namespace.include_default_association_filters
+        result.concat default_content_filters
+        result.concat custom_ransack_filters
+        result
       end
 
       def custom_ransack_filters
@@ -159,11 +163,11 @@ module ActiveAdmin
       end
 
       def search_status_section
-        ActiveAdmin::SidebarSection.new :search_status, only: :index, if: -> { params[:q] || params[:scope] } do
+        ActiveAdmin::SidebarSection.new I18n.t("active_admin.search_status.headline"), only: :index, if: -> { params[:q] || params[:scope] } do
           active = ActiveAdmin::Filters::Active.new(resource_class, params)
 
           span do
-            h4 I18n.t("active_admin.search_status.headline"), style: 'display: inline'
+            h4 I18n.t("active_admin.search_status.current_scope"), style: 'display: inline'
             b active.scope, style: "display: inline"
 
             div style: "margin-top: 10px" do
