@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ActiveAdmin::Scope do
+RSpec.describe ActiveAdmin::Scope do
 
   describe "creating a scope" do
     subject{ scope }
@@ -135,7 +135,31 @@ describe ActiveAdmin::Scope do
 
       it "should properly render the proc" do
         scope = ActiveAdmin::Scope.new proc{ Date.today.strftime '%A' }, :foobar
-        expect(scope.name).to eq Date.today.strftime '%A'
+        expect(scope.name.call).to eq Date.today.strftime '%A'
+      end
+    end
+
+    context "with scope method and localizer" do
+      let(:localizer) do
+        loc = double(:localizer)
+        allow(loc).to receive(:t).with(:published, scope: 'scopes').and_return("All published")
+        loc
+      end
+      let(:scope)        { ActiveAdmin::Scope.new :published, :published, localizer: localizer }
+
+      describe '#name' do
+        subject { super().name }
+        it         { is_expected.to eq("All published")}
+      end
+
+      describe '#id' do
+        subject { super().id }
+        it           { is_expected.to eq("published")}
+      end
+
+      describe '#scope_method' do
+        subject { super().scope_method }
+        it { is_expected.to eq(:published) }
       end
     end
 

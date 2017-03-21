@@ -14,12 +14,31 @@ Feature: Index Scoping
     And I should see the scope "All" with the count 3
     And I should see 3 posts in the table
 
+  Scenario: Viewing resources with one scope with dynamic name
+    Given 3 posts exist
+    And an index configuration of:
+      """
+      ActiveAdmin.register Post do
+        scope -> { scope_title }, :all
+
+        controller do
+          def scope_title
+            'Neat scope'
+          end
+
+          helper_method :scope_title
+        end
+      end
+      """
+    Then I should see the scope with label "Neat scope"
+    And I should see 3 posts in the table
+
   Scenario: Viewing resources with one scope as the default
     Given 3 posts exist
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true
+        scope :all, default: true
       end
       """
     Then I should see the scope "All" selected
@@ -31,7 +50,7 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => proc{ false }
+        scope :all, default: proc{ false }
       end
       """
     Then I should see the scope "All" not selected
@@ -43,7 +62,7 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true
+        scope :all, default: true
         filter :title
       end
       """
@@ -56,8 +75,8 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true
-        index :as => :table, :scope_count => false
+        scope :all, default: true
+        index as: :table, scope_count: false
       end
       """
     Then I should see the scope "All" selected
@@ -70,7 +89,7 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true, :show_count => false
+        scope :all, default: true, show_count: false
       end
       """
     Then I should see the scope "All" selected
@@ -83,9 +102,9 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true
+        scope :all, default: true
         scope :published do |posts|
-          posts.where("published_at IS NOT NULL")
+          posts.where("published_date IS NOT NULL")
         end
       end
       """
@@ -106,9 +125,9 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true
+        scope :all, default: true
         scope :published do |posts|
-          posts.where("published_at IS NOT NULL")
+          posts.where("published_date IS NOT NULL")
         end
       end
       """
@@ -135,14 +154,14 @@ Feature: Index Scoping
     And an index configuration of:
     """
     ActiveAdmin.register Post do
-      scope :all, :if => proc { false }
-      scope "Shown", :if => proc { true } do |posts|
+      scope :all, if: proc { false }
+      scope "Shown", if: proc { true } do |posts|
         posts
       end
-      scope "Default", :default => true do |posts|
+      scope "Default", default: true do |posts|
         posts
       end
-      scope 'Today', :if => proc { false } do |posts|
+      scope 'Today', if: proc { false } do |posts|
         posts.where(["created_at > ? AND created_at < ?", ::Time.zone.now.beginning_of_day, ::Time.zone.now.end_of_day])
       end
     end
@@ -158,7 +177,7 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope 'Today', :default => true do |posts|
+        scope 'Today', default: true do |posts|
           posts.where(["created_at > ? AND created_at < ?", ::Time.zone.now.beginning_of_day, ::Time.zone.now.end_of_day])
         end
         scope 'Tomorrow' do |posts|
@@ -186,7 +205,7 @@ Feature: Index Scoping
       """
         ActiveAdmin.register Post do
           scope_to :current_user
-          scope :all, :default => true
+          scope :all, default: true
 
           filter :title
 
@@ -213,9 +232,9 @@ Feature: Index Scoping
     And an index configuration of:
       """
       ActiveAdmin.register Post do
-        scope :all, :default => true
+        scope :all, default: true
         scope :published do |posts|
-          posts.where("published_at IS NOT NULL")
+          posts.where("published_date IS NOT NULL")
         end
 
         index do

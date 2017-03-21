@@ -109,7 +109,7 @@ module ActiveAdmin
       def default_filters
         result = []
         result.concat default_association_filters if namespace.include_default_association_filters
-        result.concat default_content_filters
+        result.concat content_columns
         result.concat custom_ransack_filters
         result
       end
@@ -137,15 +137,6 @@ module ActiveAdmin
         end
       end
 
-      # Returns a default set of filters for the content columns
-      def default_content_filters
-        if resource_class.respond_to? :content_columns
-          resource_class.content_columns.map{ |c| c.name.to_sym }
-        else
-          []
-        end
-      end
-
       def add_filters_sidebar_section
         self.sidebar_sections << filters_sidebar_section
       end
@@ -157,13 +148,11 @@ module ActiveAdmin
       end
 
       def add_search_status_sidebar_section
-        if current_filters_enabled?
-          self.sidebar_sections << search_status_section
-        end
+        self.sidebar_sections << search_status_section
       end
 
       def search_status_section
-        ActiveAdmin::SidebarSection.new I18n.t("active_admin.search_status.headline"), only: :index, if: -> { params[:q] || params[:scope] } do
+        ActiveAdmin::SidebarSection.new I18n.t("active_admin.search_status.headline"), only: :index, if: -> {active_admin_config.current_filters_enabled? && (params[:q] || params[:scope]) } do
           active = ActiveAdmin::Filters::Active.new(resource_class, params)
 
           span do

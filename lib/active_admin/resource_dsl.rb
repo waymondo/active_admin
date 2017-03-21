@@ -1,12 +1,27 @@
 module ActiveAdmin
   # This is the class where all the register blocks are evaluated.
   class ResourceDSL < DSL
-    def initialize(config, resource_class)
-      @resource = resource_class
-      super(config)
-    end
 
     private
+
+    # Redefine sort behaviour for column
+    #
+    # For example:
+    #
+    #   # nulls last
+    #   order_by(:age) do |order_clause|
+    #     [order_clause.to_sql, 'NULLS LAST'].join(' ')  if order_clause.order == 'desc'
+    #   end
+    #
+    #   # by last_name but in the case that there is no last name, by first_name.
+    #   order_by(:full_name) do |order_clause|
+    #     ['COALESCE(NULLIF(last_name, ''), first_name), first_name', order_clause.order].join(' ')
+    #   end
+    #
+    #
+    def order_by(column, &block)
+      config.ordering[column] = block
+    end
 
     def belongs_to(target, options = {})
       config.belongs_to(target, options)
@@ -28,7 +43,7 @@ module ActiveAdmin
     end
 
     #
-    # Rails 4 Strong Parameters Support
+    # Keys included in the `permitted_params` setting are automatically whitelisted.
     #
     # Either
     #
@@ -45,14 +60,13 @@ module ActiveAdmin
     #     end
     #   end
     #
-    # Keys included in the `permitted_params` setting are automatically whitelisted.
-    #
     def permit_params(*args, &block)
       param_key = config.param_key.to_sym
+      belongs_to_param = config.belongs_to_param
 
       controller do
         define_method :permitted_params do
-          params.permit *active_admin_namespace.permitted_params,
+          params.permit *(active_admin_namespace.permitted_params + Array.wrap(belongs_to_param)),
             param_key => block ? instance_exec(&block) : args
         end
       end
@@ -87,7 +101,7 @@ module ActiveAdmin
     #   end
     #
     def csv(options={}, &block)
-      options[:resource] = @resource
+      options[:resource] = config
 
       config.csv_builder = CSVBuilder.new(options, &block)
     end
@@ -116,8 +130,7 @@ module ActiveAdmin
       title = options.delete(:title)
 
       controller do
-        callback = ActiveAdmin::Dependency.rails >= 4 ? :before_action : :before_filter
-        send(callback, only: [name]) { @page_title = title } if title
+        before_action(only: [name]) { @page_title = title } if title
         define_method(name, &block || Proc.new{})
       end
     end
@@ -128,6 +141,13 @@ module ActiveAdmin
 
     def collection_action(name, options = {}, &block)
       action config.collection_actions, name, options, &block
+    end
+
+    def decorate_with(decorator_class)
+      # Force storage as a string. This will help us with reloading issues.
+      # Assuming decorator_class.to_s will return the name of the class allows
+      # us to handle a string or a class.
+      config.decorator_class_name = "::#{ decorator_class }"
     end
 
     # Defined Callbacks
@@ -160,17 +180,16 @@ module ActiveAdmin
     delegate :before_save,    :after_save,    to: :controller
     delegate :before_destroy, :after_destroy, to: :controller
 
-    # This code defines both *_filter and *_action for Rails 3.2 to Rails 5.
+    # This code defines both *_filter and *_action for Rails 4.0 to Rails 5.
     actions = [
       :before, :skip_before,
       :after,  :skip_after,
       :around, :skip
     ]
-    destination = ActiveAdmin::Dependency.rails >= 4 ? :action : :filter
     [:action, :filter].each do |name|
       actions.each do |action|
         define_method "#{action}_#{name}" do |*args, &block|
-          controller.public_send "#{action}_#{destination}", *args, &block
+          controller.public_send "#{action}_action", *args, &block
         end
       end
     end

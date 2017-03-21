@@ -14,6 +14,7 @@ module ActiveAdmin
 
       autoload :Base
       autoload :StringInput
+      autoload :TextInput
       autoload :DatePickerInput
       autoload :DateRangeInput
       autoload :NumericInput

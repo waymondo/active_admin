@@ -10,8 +10,12 @@ Then /^I should see the scope "([^"]*)" not selected$/ do |name|
 end
 
 Then /^I should see the scope "([^"]*)" with the count (\d+)$/ do |name, count|
-  name = name.tr(' ','').underscore.downcase
+  name = name.tr(' ', '').underscore.downcase
   step %{I should see "#{count}" within ".scopes .#{name} .count"}
+end
+
+Then /^I should see the scope with label "([^"]*)"$/ do |label|
+  expect(page).to have_link(label)
 end
 
 Then /^I should see the scope "([^"]*)" with no count$/ do |name|

@@ -31,7 +31,7 @@ module ActiveAdmin
 
       def build_scope(scope, options)
         li class: classes_for_scope(scope) do
-          scope_name = I18n.t "active_admin.scopes.#{scope.id}", default: scope.name
+          scope_name = I18n.t "active_admin.scopes.#{scope.id}", default: name_for_scope(scope)
           params     = request.query_parameters.except :page, :scope, :commit, :format
 
           a href: url_for(scope: scope.id, params: params), class: 'table_tools_button' do
@@ -60,6 +60,13 @@ module ActiveAdmin
       # Return the count for the scope passed in.
       def get_scope_count(scope)
         collection_size(scope_chain(scope, collection_before_scope))
+      end
+
+      def name_for_scope(scope)
+        case scope.name
+          when Proc then self.instance_exec(&scope.name).to_s
+          else      scope.name.to_s
+        end
       end
     end
   end

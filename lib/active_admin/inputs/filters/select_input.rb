@@ -7,7 +7,7 @@ module ActiveAdmin
         def input_name
           return method if seems_searchable?
 
-          searchable_method_name.concat multiple? ? '_in' : '_eq'
+          searchable_method_name + (multiple? ? '_in' : '_eq')
         end
 
         def searchable_method_name
@@ -45,8 +45,7 @@ module ActiveAdmin
         end
 
         def pluck_column
-          distinct = ActiveAdmin::Dependency.rails >= 4 ? :distinct : :uniq
-          klass.reorder("#{method} asc").public_send(distinct).pluck method
+          klass.reorder("#{method} asc").distinct.pluck method
         end
 
       end

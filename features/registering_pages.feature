@@ -49,7 +49,7 @@ Feature: Registering Pages
     Given a configuration of:
     """
     ActiveAdmin.register_page "Status" do
-      content :title => "Custom Page Title" do
+      content title: "Custom Page Title" do
         "I love chocolate."
       end
     end
@@ -62,7 +62,7 @@ Feature: Registering Pages
     Given a configuration of:
     """
     ActiveAdmin.register_page "Status" do
-      content :title => proc{ "Custom Page Title from Proc" } do
+      content title: proc{ "Custom Page Title from Proc" } do
         "I love chocolate."
       end
     end
@@ -106,6 +106,36 @@ Feature: Registering Pages
     And I follow "Status"
     Then I should see an action item link to "Visit"
 
+  Scenario: Adding a page action to a page with multiple http methods
+    Given a configuration of:
+    """
+    ActiveAdmin.register_page "Status" do
+      page_action :check, method: [:get, :post] do
+        redirect_to admin_status_path, notice: "Checked via #{request.method}"
+      end
+
+      action_item :post_check do
+         link_to "Post Check", admin_status_check_path, method: :post
+      end
+
+      action_item :get_check do
+        link_to "Get Check", admin_status_check_path
+      end
+
+      content do
+        "I love chocolate."
+      end
+    end
+    """
+    When I go to the dashboard
+    And I follow "Status"
+    And I follow "Post Check"
+    Then I should see "Checked via POST"
+    And I should see the Active Admin layout
+    When I follow "Get Check"
+    Then I should see "Checked via GET"
+    And I should see the Active Admin layout
+
   Scenario: Adding a page action to a page
     Given a configuration of:
     """
@@ -146,3 +176,44 @@ Feature: Registering Pages
     And I follow "Check"
     Then I should see the content "Chocolate lØves You Too!"
     And I should see the Active Admin layout
+
+  Scenario: Registering a page with paginated index table for a collection Array
+    Given a user named "John Doe" exists
+    Given a configuration of:
+    """
+    ActiveAdmin.register_page "Special users" do
+      content do
+        collection = Kaminari.paginate_array(User.all).page(params.fetch(:page, 1))
+
+        table_for(collection, class: "index_table") do
+          column :first_name
+          column :last_name
+        end
+
+        paginated_collection(collection, entry_name: "Special users")
+      end
+    end
+    """
+    When I go to the dashboard
+    And I follow "Special users"
+    Then I should see the page title "Special users"
+    And I should see the Active Admin layout
+    And I should see 1 user in the table
+
+  Scenario: Displaying parent information from a belongs_to page
+    Given a configuration of:
+    """
+    ActiveAdmin.register Post
+    ActiveAdmin.register_page "Status" do
+      belongs_to :post
+
+      content do
+        "Status page for #{helpers.parent.title}"
+      end
+    end
+    """
+    And 1 post with the title "Post 1" exists
+    When I go to the first post custom status page
+    Then I should see the content "Status page for Post 1"
+    And  I should see a link to "Post 1" in the breadcrumb
+

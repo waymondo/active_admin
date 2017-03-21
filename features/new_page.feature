@@ -9,10 +9,8 @@ Feature: New Page
     Given a configuration of:
     """
       ActiveAdmin.register Post do
-        if Rails::VERSION::MAJOR >= 4
-          permit_params :custom_category_id, :author_id, :title,
-            :body, :position, :published_at, :starred
-        end
+        permit_params :custom_category_id, :author_id, :title,
+          :body, :position, :published_date, :starred
       end
     """
     When I am on the index page for posts
@@ -27,14 +25,14 @@ Feature: New Page
     Then I should see "Post was successfully created."
     And I should see the attribute "Title" with "Hello World"
     And I should see the attribute "Body" with "This is the body"
-    #And I should see the attribute "Category" with "Music"
+    And I should see the attribute "Category" with "Music"
     And I should see the attribute "Author" with "John Doe"
 
   Scenario: Generating a custom form
     Given a configuration of:
     """
       ActiveAdmin.register Post do
-        permit_params :custom_category_id, :author_id, :title, :body, :published_at, :starred if Rails::VERSION::MAJOR >= 4
+        permit_params :custom_category_id, :author_id, :title, :body, :published_date, :starred
 
         form do |f|
           f.inputs "Your Post" do
@@ -42,7 +40,7 @@ Feature: New Page
             f.input :body
           end
           f.inputs "Publishing" do
-            f.input :published_at
+            f.input :published_date
           end
           f.actions
         end
@@ -62,7 +60,7 @@ Feature: New Page
     Given "app/views/admin/posts/_form.html.erb" contains:
     """
       <% url = @post.new_record? ? admin_posts_path : admin_post_path(@post) %>
-      <%= active_admin_form_for @post, :url => url do |f|
+      <%= active_admin_form_for @post, url: url do |f|
             f.inputs :title, :body
             f.actions
           end %>
@@ -70,9 +68,9 @@ Feature: New Page
     Given a configuration of:
     """
       ActiveAdmin.register Post do
-        permit_params :custom_category_id, :author_id, :title, :body, :published_at, :starred if Rails::VERSION::MAJOR >= 4
+        permit_params :custom_category_id, :author_id, :title, :body, :published_date, :starred
 
-        form :partial => "form"
+        form partial: "form"
       end
     """
     Given I follow "New Post"
@@ -87,7 +85,7 @@ Feature: New Page
     Given a configuration of:
     """
       ActiveAdmin.register Post do
-        permit_params :custom_category_id, :author_id, :title, :body, :published_at, :starred if Rails::VERSION::MAJOR >= 4
+        permit_params :custom_category_id, :author_id, :title, :body, :published_date, :starred
 
         form do |f|
           f.inputs "Your Post" do
@@ -98,7 +96,7 @@ Feature: New Page
             f.input :body
           end
           f.inputs "Publishing" do
-            f.input :published_at
+            f.input :published_date
           end
           f.actions
         end

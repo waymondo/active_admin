@@ -12,8 +12,8 @@ module ActiveAdmin
 
       RESERVED_NAMES = [:active_admin_user]
 
-      class_option  :default_user, :type => :boolean, :default => true,
-                    :desc => "Should a default user be created inside the migration?"
+      class_option  :default_user, type: :boolean, default: true,
+                    desc: "Should a default user be created inside the migration?"
 
       def install_devise
         begin
@@ -24,7 +24,10 @@ module ActiveAdmin
 
         require 'devise'
 
-        if File.exists?(File.join(destination_root, "config", "initializers", "devise.rb"))
+        initializer_file =
+          File.join(destination_root, "config", "initializers", "devise.rb")
+
+        if File.exist?(initializer_file)
           log :generate, "No need to install devise, already done."
         else
           log :generate, "devise:install"
@@ -52,7 +55,7 @@ module ActiveAdmin
       end
 
       def add_default_user_to_seed
-        seeds_paths = Rails.application.paths["db/seeds.rb"] || Rails.application.paths["db/seeds"] # "db/seeds" => Rails 3.2 fallback
+        seeds_paths = Rails.application.paths["db/seeds.rb"]
         seeds_file = seeds_paths.existent.first
         return if seeds_file.nil? || !options[:default_user]
 

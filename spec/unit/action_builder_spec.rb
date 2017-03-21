@@ -1,19 +1,15 @@
 require 'rails_helper'
 
-describe 'defining actions from registration blocks', type: :controller do
+RSpec.describe 'defining actions from registration blocks', type: :controller do
   let(:klass){ Admin::PostsController }
-  render_views # https://github.com/rspec/rspec-rails/issues/860
 
   before do
+    load_resources { action! }
+
     @controller = klass.new
   end
 
   describe 'creates a member action' do
-    before do
-      action!
-      reload_routes!
-    end
-
     after(:each) do
       klass.clear_member_actions!
     end
@@ -72,11 +68,6 @@ describe 'defining actions from registration blocks', type: :controller do
   end
 
   describe 'creates a collection action' do
-    before do
-      action!
-      reload_routes!
-    end
-
     after(:each) do
       klass.clear_collection_actions!
     end

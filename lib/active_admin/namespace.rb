@@ -45,7 +45,7 @@ module ActiveAdmin
 
       # Register the resource
       register_resource_controller(config)
-      parse_registration_block(config, resource_class, &block) if block_given?
+      parse_registration_block(config, &block) if block_given?
       reset_menu!
 
       # Dispatch a registration event
@@ -194,7 +194,7 @@ module ActiveAdmin
       resources.each do |resource|
         parent = (module_name || 'Object').constantize
         name   = resource.controller_name.split('::').last
-        parent.send(:remove_const, name) if parent.const_defined? name
+        parent.send(:remove_const, name) if parent.const_defined?(name, false)
 
         # Remove circular references
         resource.controller.active_admin_config = nil
@@ -218,8 +218,8 @@ module ActiveAdmin
       config.controller.active_admin_config = config
     end
 
-    def parse_registration_block(config, resource_class, &block)
-      config.dsl = ResourceDSL.new(config, resource_class)
+    def parse_registration_block(config, &block)
+      config.dsl = ResourceDSL.new(config)
       config.dsl.run_registration_block(&block)
 
       # Add any other convenience controller actions not included in inherited_resources.

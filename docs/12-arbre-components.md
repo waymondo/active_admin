@@ -1,3 +1,6 @@
+---
+redirect_from: /docs/12-arbre-components.html
+---
 # Arbre Components
 
 Arbre allows the creation of shareable and extendable HTML components and is
@@ -56,7 +59,7 @@ the rest.
 
 #### Simple Columns
 
-To create simple columnns, use the `columns` method. Within the block, call
+To create simple columns, use the `columns` method. Within the block, call
 the #column method to create a new column.
 
 ```ruby

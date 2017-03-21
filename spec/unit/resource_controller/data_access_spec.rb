@@ -1,6 +1,10 @@
 require 'rails_helper'
 
-describe ActiveAdmin::ResourceController::DataAccess do
+RSpec.describe ActiveAdmin::ResourceController::DataAccess do
+  before do
+    load_resources { ActiveAdmin.register Post }
+  end
+
   let(:params) do
     {}
   end
@@ -20,6 +24,22 @@ describe ActiveAdmin::ResourceController::DataAccess do
       expect(chain).to receive(:ransack).with(params[:q]).once.and_return(Post.ransack)
       controller.send :apply_filtering, chain
     end
+
+    context "params includes empty values" do
+      let(:params) do
+        { q: {id_eq: 1, position_eq: ""} }
+      end
+      it "should return relation without empty filters" do
+        expect(Post).to receive(:ransack).with(params[:q]).once.and_wrap_original do |original, *args|
+          chain  = original.call(*args)
+          expect(chain.conditions.size).to eq(1)
+          chain
+        end
+        controller.send :apply_filtering, Post
+      end
+    end
+
+
   end
 
   describe "sorting" do
@@ -41,6 +61,35 @@ describe ActiveAdmin::ResourceController::DataAccess do
         chain = double "ChainObj"
         expect(chain).not_to receive(:reorder)
         expect(controller.send(:apply_sorting, chain)).to eq chain
+      end
+    end
+
+    context "custom strategy" do
+      before do
+        expect(controller.send(:active_admin_config)).to receive(:ordering).twice.and_return(
+          {
+            published_date: proc do |order_clause|
+              [order_clause.to_sql, 'NULLS LAST'].join(' ') if order_clause.order == 'desc'
+            end
+          }.with_indifferent_access
+        )
+      end
+
+      context "when params applicable" do
+        let(:params) {{ order: "published_date_desc" }}
+        it "reorders chain" do
+          chain = double "ChainObj"
+          expect(chain).to receive(:reorder).with('"posts"."published_date" desc NULLS LAST').once.and_return(Post.search)
+          controller.send :apply_sorting, chain
+        end
+      end
+      context "when params not applicable" do
+        let(:params) {{ order: "published_date_asc" }}
+        it "reorders chain" do
+          chain = double "ChainObj"
+          expect(chain).to receive(:reorder).with('"posts"."published_date" asc').once.and_return(Post.search)
+          controller.send :apply_sorting, chain
+        end
       end
     end
 

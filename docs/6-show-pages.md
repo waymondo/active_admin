@@ -1,3 +1,6 @@
+---
+redirect_from: /docs/6-show-pages.html
+---
 # Customize the Show Page
 
 The show block is rendered within the context of the view and uses [Arbre](https://github.com/activeadmin/arbre) syntax.
@@ -78,7 +81,7 @@ end
 
 # Tabs
 
-You can arrage content in tabs as shown below:
+You can arrange content in tabs as shown below:
 
 ```ruby
   ActiveAdmin.register Order do 

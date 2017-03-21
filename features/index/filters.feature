@@ -9,13 +9,13 @@ Feature: Index Filtering
     When I am on the index page for posts
     Then I should see "Displaying all 3 Posts"
     And I should see the following filters:
-     | Author       | select     |
-     | Category     | select     |
-     | Title        | string     |
-     | Body         | string     |
-     | Published at | date range |
-     | Created at   | date range |
-     | Updated at   | date range |
+     | Author         | select     |
+     | Category       | select     |
+     | Title          | string     |
+     | Body           | string     |
+     | Published date | date range |
+     | Created at     | date range |
+     | Updated at     | date range |
 
     When I fill in "Title" with "Hello World 2"
     And I press "Filter"
@@ -60,7 +60,7 @@ Feature: Index Filtering
     And an index configuration of:
     """
       ActiveAdmin.register Post do
-        filter :author, :as => :check_boxes
+        filter :author, as: :check_boxes
       end
     """
     When I press "Filter"
@@ -74,7 +74,7 @@ Feature: Index Filtering
     And an index configuration of:
     """
       ActiveAdmin.register Post do
-        filter :author, :as => :check_boxes
+        filter :author, as: :check_boxes
       end
     """
     When I check "Jane Doe"
@@ -134,7 +134,7 @@ Feature: Index Filtering
     And an index configuration of:
     """
       ActiveAdmin.register Category do
-        filter :authors, :as => :check_boxes
+        filter :authors, as: :check_boxes
       end
     """
     When I press "Filter"
@@ -149,7 +149,7 @@ Feature: Index Filtering
     And an index configuration of:
     """
       ActiveAdmin.register Category do
-        filter :authors, :as => :check_boxes
+        filter :authors, as: :check_boxes
       end
     """
     When I check "Jane Doe"
@@ -158,4 +158,24 @@ Feature: Index Filtering
     And I should see "Non-Fiction" within ".index_table"
     And the "Jane Doe" checkbox should be checked
 
+  Scenario: Enabling filters status sidebar
+    Given an index configuration of:
+    """
+      ActiveAdmin.application.current_filters = false
+      ActiveAdmin.register Post do
+        config.current_filters = true
+      end
+    """
+    And I press "Filter"
+    Then I should see a sidebar titled "Search Status:"
 
+  Scenario: Disabling filters status sidebar
+    Given an index configuration of:
+    """
+      ActiveAdmin.application.current_filters = true
+      ActiveAdmin.register Post do
+        config.current_filters = false
+      end
+    """
+    And I press "Filter"
+    Then I should not see a sidebar titled "Search Status:"

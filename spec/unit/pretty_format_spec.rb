@@ -1,17 +1,15 @@
 require 'rails_helper'
+require 'active_admin/view_helpers/display_helper'
 
-describe "#pretty_format" do
+RSpec.describe "#pretty_format" do
   include ActiveAdmin::ViewHelpers::DisplayHelper
 
   def method_missing(*args, &block)
     mock_action_view.send *args, &block
   end
 
-  {String: 'hello', Fixnum: 23, Float: 5.67, Bignum: 10**30, Symbol: :foo,
-    'Arbre::Element' => Arbre::Element.new.br(:foo)
-  }.each do |klass, obj|
-    it "should call `to_s` on #{klass}s" do
-      expect(obj).to be_a klass.to_s.constantize # safeguard for Bignum
+  ['hello', 23, 5.67, 10**30, :foo, Arbre::Element.new.br(:foo)].each do |obj|
+    it "should call `to_s` on #{obj.class}s" do
       expect(pretty_format(obj)).to eq obj.to_s
     end
   end
@@ -25,16 +23,16 @@ describe "#pretty_format" do
 
     context "actually do the formatting" do
       it "should actually do the formatting" do
-        t = Time.utc(1985,"feb",28,20,15,1)
+        t = Time.utc(1985, "feb", 28, 20, 15, 1)
         expect(pretty_format(t)).to eq "February 28, 1985 20:15"
       end
 
       context "apply custom localize format" do
-        before do
+        around do |example|
+          previous_localize_format = ActiveAdmin.application.localize_format
           ActiveAdmin.application.localize_format = :short
-        end
-        after do
-          ActiveAdmin.application = nil
+          example.call
+          ActiveAdmin.application.localize_format = previous_localize_format
         end
         it "should actually do the formatting" do
           t = Time.utc(1985, "feb", 28, 20, 15, 1)
@@ -44,15 +42,15 @@ describe "#pretty_format" do
       end
 
       context "with non-English locale" do
-        before(:all) do
+        before do
           @previous_locale = I18n.locale.to_s
           I18n.locale = "es"
         end
-        after(:all) do
+        after do
           I18n.locale = @previous_locale
         end
         it "should return a localized Date or Time with long format for non-english locale" do
-          t = Time.utc(1985,"feb",28,20,15,1)
+          t = Time.utc(1985, "feb", 28, 20, 15, 1)
           expect(pretty_format(t)).to eq "28 de febrero de 1985 20:15"
         end
       end

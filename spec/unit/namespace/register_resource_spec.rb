@@ -3,10 +3,12 @@ require 'rails_helper'
 # TODO: refactor this file so it doesn't depend on the Admin namespace in such a broken way.
 #       Specifically, the dashboard is already defined.
 
-describe ActiveAdmin::Namespace, "registering a resource" do
+RSpec.describe ActiveAdmin::Namespace, "registering a resource" do
   let(:application){ ActiveAdmin::Application.new }
   let(:namespace){ ActiveAdmin::Namespace.new(application, :admin) }
   let(:menu){ namespace.fetch_menu(:default) }
+
+  after { namespace.unload! }
 
   context "with no configuration" do
     before do

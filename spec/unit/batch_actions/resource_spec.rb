@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ActiveAdmin::BatchActions::ResourceExtension do
+RSpec.describe ActiveAdmin::BatchActions::ResourceExtension do
 
   let(:resource) do
     namespace = ActiveAdmin::Namespace.new(ActiveAdmin::Application.new, :admin)
@@ -50,19 +50,6 @@ describe ActiveAdmin::BatchActions::ResourceExtension do
       expect(resource.batch_actions.size).to eq 0
     end
 
-  end
-
-  describe "#batch_action_path" do
-
-    it "returns the path as a symbol" do
-      expect(resource.batch_action_path).to eq "/admin/posts/batch_action"
-    end
-
-    it "includes :scope and :q params" do
-      params = { q: { name_equals: "Any" }, scope: :all }
-      batch_action_path = "/admin/posts/batch_action?q%5Bname_equals%5D=Any&scope=all"
-      expect(resource.batch_action_path(params)).to eq(batch_action_path)
-    end
   end
 
   describe "#display_if_block" do

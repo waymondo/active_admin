@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ActiveAdmin::Namespace do
+RSpec.describe ActiveAdmin::Namespace do
 
   let(:application){ ActiveAdmin::Application.new }
 
@@ -23,6 +23,28 @@ describe ActiveAdmin::Namespace do
       expect(namespace.fetch_menu(:default).children).to be_empty
     end
   end # context "when new"
+
+  describe "#unload!" do
+    context "when controller is only defined without a namespace" do
+      before do
+        # To ensure Admin::PostsController is defined
+        ActiveAdmin.register Post
+
+        # To ensure ::PostsController is defined
+        ActiveAdmin.register Post, namespace: false
+
+        # To prevent unload! from unregistering ::PostsController
+        ActiveAdmin.application.namespaces.instance_variable_get(:@namespaces).delete(:root)
+
+        # To force Admin::PostsController to not be there
+        Admin.send(:remove_const, 'PostsController')
+      end
+
+      it "should not crash" do
+        expect { ActiveAdmin.unload! }.not_to raise_error
+      end
+    end
+  end
 
   describe "settings" do
     let(:namespace){ ActiveAdmin::Namespace.new(application, :admin) }

@@ -21,6 +21,8 @@ module NavigationHelpers
       "/admin/login"
     when /the first post show page/
       "/admin/posts/1"
+    when /the first post custom status page/
+      "/admin/posts/1/status"
     when /the first post edit page/
       "/admin/posts/1/edit"
     when /the admin password reset form with token "([^"]*)"/
@@ -39,11 +41,17 @@ module NavigationHelpers
     when /^the index page for (.*)$/
       send "admin_#{$1}_path"
 
+    when /^the (.*) index page for (.*)$/
+      send "admin_#{$2}_path", format: $1
+
     when /^the last author's posts$/
       admin_user_posts_path(User.last)
 
     when /^the last author's last post page$/
       admin_user_post_path(User.last, Post.where(author_id: User.last.id).last)
+
+    when /^the last post's show page$/
+      admin_post_path(Post.last)
 
     when /^the last post's edit page$/
       edit_admin_post_path(Post.last)

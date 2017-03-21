@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ActiveAdmin::Application do
+RSpec.describe ActiveAdmin::Application do
   let(:application){ ActiveAdmin::Application.new }
   let(:controllers){ application.controllers_for_filters }
 
@@ -17,10 +17,8 @@ describe ActiveAdmin::Application do
     positions = %w(before around after)
     suffixes = %w(filter)
     base = %w(skip_filter)
-    if Rails::VERSION::MAJOR >= 4
-      suffixes += %w(action)
-      base += %w(skip_action_callback)
-    end
+    suffixes += %w(action)
+    base += %w(skip_action_callback)
 
     prefixes.each_with_object(base) do |prefix, stack|
       positions.each do |position|

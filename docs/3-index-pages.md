@@ -1,3 +1,6 @@
+---
+redirect_from: /docs/3-index-pages.html
+---
 # Customizing the Index Page
 
 Filtering and listing resources is one of the most important tasks for
@@ -100,6 +103,22 @@ the collection as a proc to be called at render time.
 filter :author, as: :check_boxes, collection: proc { Author.all }
 ```
 
+To override options for string or numeric filter pass `filters` option.
+
+```ruby
+  filter :title, filters: [:starts_with, :ends_with]
+```
+
+Also, if you don't need the select with the options 'contains', 'equals', 'starts_with' or 'ends_with'
+just add the option to the filter name with an underscore.
+
+For example:
+```ruby
+filter :name_equals
+# or
+filter :name_contains
+```
+
 You can change the filter label by passing a label option:
 
 ```ruby
@@ -185,6 +204,8 @@ scope "Published", if: proc { current_admin_user.can? :manage, Posts } do |posts
   posts.published
 end
 ```
+
+Scopes can be labelled with a translation, e.g. `activerecord.scopes.invoice.expired`.
 
 ## Index default sort order
 

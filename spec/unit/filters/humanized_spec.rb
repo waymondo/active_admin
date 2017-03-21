@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe ActiveAdmin::Filters::Humanized do
+RSpec.describe ActiveAdmin::Filters::Humanized do
   describe '#value' do
     it 'should equal query string parameter if not an Array' do
       param = ['category_id_eq', '1']
@@ -50,6 +50,14 @@ describe ActiveAdmin::Filters::Humanized do
         param = ['name_predicate_does_not_exist', 'test']
         humanizer = ActiveAdmin::Filters::Humanized.new(param)
         expect(humanizer.body).to eq("Name Predicate Does Not Exist")
+      end
+    end
+
+    context 'when column name similar to predicate' do
+      it 'parses correct predicate' do
+        param = ['time_start_gteq', 'test']
+        humanizer = ActiveAdmin::Filters::Humanized.new(param)
+        expect(humanizer.body).to eq('Time Start greater than or equal to')
       end
     end
   end

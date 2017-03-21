@@ -2,15 +2,22 @@
 
 require 'rails_helper'
 
-describe ActiveAdmin, "Routing", type: :routing do
+RSpec.describe ActiveAdmin, "Routing", type: :routing do
 
   before do
     load_defaults!
     reload_routes!
   end
 
+  after :all do
+    load_defaults!
+    reload_routes!
+  end
+
+  let(:namespaces) { ActiveAdmin.application.namespaces }
+
   it "should only have the namespaces necessary for route testing" do
-    expect(ActiveAdmin.application.namespaces.names).to eq [:admin, :root]
+    expect(namespaces.names).to eq [:admin]
   end
 
   it "should route to the admin dashboard" do
@@ -21,6 +28,24 @@ describe ActiveAdmin, "Routing", type: :routing do
     context "when in admin namespace" do
       it "should be admin_root_path" do
         expect(admin_root_path).to eq "/admin"
+      end
+    end
+  end
+
+  describe "route_options" do
+    context "with a custom path set in route_options" do
+      before do
+        namespaces[:admin].route_options = { path: '/custom-path' }
+        reload_routes!
+      end
+
+      after do
+        namespaces[:admin].route_options = {}
+        reload_routes!
+      end
+
+      it "should route using the custom path" do
+        expect(admin_posts_path).to eq "/custom-path/posts"
       end
     end
   end
@@ -47,6 +72,10 @@ describe ActiveAdmin, "Routing", type: :routing do
     context "when in root namespace" do
       before(:each) do
         load_resources { ActiveAdmin.register(Post, namespace: false) }
+      end
+
+      after(:each) do
+        namespaces.instance_variable_get(:@namespaces).delete(:root)
       end
 
       it "should route the index path" do
@@ -116,7 +145,7 @@ describe ActiveAdmin, "Routing", type: :routing do
     end
 
     it "should route the nested show path" do
-      expect(admin_user_post_path(1,2)).to eq "/admin/users/1/posts/2"
+      expect(admin_user_post_path(1, 2)).to eq "/admin/users/1/posts/2"
     end
 
     it "should route the nested new path" do
@@ -124,7 +153,7 @@ describe ActiveAdmin, "Routing", type: :routing do
     end
 
     it "should route the nested edit path" do
-      expect(edit_admin_user_post_path(1,2)).to eq "/admin/users/1/posts/2/edit"
+      expect(edit_admin_user_post_path(1, 2)).to eq "/admin/users/1/posts/2/edit"
     end
 
     context "with collection action" do
@@ -155,25 +184,29 @@ describe ActiveAdmin, "Routing", type: :routing do
       it "should route to the page under /admin" do
         expect(admin_chocolate_i_love_you_path).to eq "/admin/chocolate_i_love_you"
       end
+    end
 
-      context "when in the root namespace" do
-        before(:each) do
-          load_resources { ActiveAdmin.register_page("Chocolate I lØve You!", namespace: false) }
-        end
-
-        it "should route to page under /" do
-          expect(chocolate_i_love_you_path).to eq "/chocolate_i_love_you"
-        end
+    context "when in the root namespace" do
+      before(:each) do
+        load_resources { ActiveAdmin.register_page("Chocolate I lØve You!", namespace: false) }
       end
 
-      context "when singular page name" do
-        before(:each) do
-          load_resources { ActiveAdmin.register_page("Log") }
-        end
+      after(:each) do
+        namespaces.instance_variable_get(:@namespaces).delete(:root)
+      end
 
-        it "should not inject _index_ into the route name" do
-          expect(admin_log_path).to eq "/admin/log"
-        end
+      it "should route to page under /" do
+        expect(chocolate_i_love_you_path).to eq "/chocolate_i_love_you"
+      end
+    end
+
+    context "when singular page name" do
+      before(:each) do
+        load_resources { ActiveAdmin.register_page("Log") }
+      end
+
+      it "should not inject _index_ into the route name" do
+        expect(admin_log_path).to eq "/admin/log"
       end
     end
   end

@@ -4,18 +4,18 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] ||= "cucumber"
+ENV['RAILS_ENV'] = 'test'
 
 require File.expand_path('../../../spec/spec_helper', __FILE__)
 
-ENV['RAILS_ROOT'] = File.expand_path("../../../spec/rails/rails-#{ENV["RAILS"]}", __FILE__)
+require 'rails'
+ENV['RAILS_ROOT'] = File.expand_path("../../../spec/rails/rails-#{Rails.version}", __FILE__)
 
 # Create the test app if it doesn't exists
 unless File.exists?(ENV['RAILS_ROOT'])
   system 'rake setup'
 end
 
-require 'rails'
 require 'active_record'
 require 'active_admin'
 require 'devise'
@@ -23,8 +23,7 @@ ActiveAdmin.application.load_paths = [ENV['RAILS_ROOT'] + "/app/admin"]
 
 require ENV['RAILS_ROOT'] + '/config/environment'
 
-# Setup autoloading of ActiveAdmin and the load path
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+# Setup autoloading of ActiveAdmin
 autoload :ActiveAdmin, 'active_admin'
 
 require 'cucumber/rails'
@@ -58,6 +57,9 @@ Capybara.javascript_driver = :poltergeist
 # steps to use the XPath syntax.
 Capybara.default_selector = :css
 
+# Make input type=hidden visible
+Capybara.ignore_hidden_elements = false
+
 # If you set this to false, any error raised from within your app will bubble
 # up to your step definition and out to cucumber unless you catch it somewhere
 # on the way. You can make Rails rescue errors and render error pages on a
@@ -69,34 +71,9 @@ Capybara.default_selector = :css
 # of your scenarios, as this makes it hard to discover errors in your application.
 ActionController::Base.allow_rescue = false
 
-# If you set this to true, each scenario will run in a database transaction.
-# You can still turn off transactions on a per-scenario basis, simply tagging
-# a feature or scenario with the @no-txn tag. If you are using Capybara,
-# tagging with @culerity or @javascript will also turn transactions off.
-#
-# If you set this to false, transactions will be off for all scenarios,
-# regardless of whether you use @no-txn or not.
-#
-# Beware that turning transactions off will leave data in your database
-# after each scenario, which can lead to hard-to-debug failures in
-# subsequent scenarios. If you do this, we recommend you create a Before
-# block that will explicitly put your database in a known state.
-if ActiveAdmin::Dependency.rails5?
-  Cucumber::Rails::World.use_transactional_tests = true
-else
-  Cucumber::Rails::World.use_transactional_fixtures = true
-end
-
-# How to clean your database when transactions are turned off. See
-# http://github.com/bmabey/database_cleaner for more info.
-if defined?(ActiveRecord::Base)
-  begin
-    require 'database_cleaner'
-    require 'database_cleaner/cucumber'
-    DatabaseCleaner.strategy = :truncation
-  rescue LoadError => ignore_if_database_cleaner_not_present
-  end
-end
+# Database resetting strategy
+DatabaseCleaner.strategy = :truncation
+Cucumber::Rails::Database.javascript_strategy = :truncation
 
 # Warden helpers to speed up login
 # See https://github.com/plataformatec/devise/wiki/How-To:-Test-with-Capybara
@@ -126,29 +103,11 @@ Before do
 end
 
 # Force deprecations to raise an exception.
-# This would set `behavior = :raise`, but that wasn't added until Rails 4.
-ActiveSupport::Deprecation.behavior = -> message, callstack do
-  e = StandardError.new message
-  e.set_backtrace callstack.map(&:to_s)
-  puts e # sometimes Cucumber otherwise won't show the error message
-  raise e
-end
+ActiveSupport::Deprecation.behavior = :raise
 
 # improve the performance of the specs suite by not logging anything
 # see http://blog.plataformatec.com.br/2011/12/three-tips-to-improve-the-performance-of-your-test-suite/
 Rails.logger.level = 4
-
-# Improves performance by forcing the garbage collector to run less often.
-unless ENV['DEFER_GC'] == '0' || ENV['DEFER_GC'] == 'false'
-  require File.expand_path('../../../spec/support/deferred_garbage_collection', __FILE__)
-  Before { DeferredGarbageCollection.start }
-  After  { DeferredGarbageCollection.reconsider }
-end
-
-# Don't run @rails4 tagged features for versions before Rails 4.
-Before('@rails4') do |scenario|
-  scenario.skip_invoke! if Rails::VERSION::MAJOR < 4
-end
 
 Around '@silent_unpermitted_params_failure' do |scenario, block|
   original = ActionController::Parameters.action_on_unpermitted_parameters

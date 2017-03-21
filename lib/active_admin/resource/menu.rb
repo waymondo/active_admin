@@ -10,6 +10,7 @@ module ActiveAdmin
           @include_in_menu   = false
           @menu_item_options = {}
         else
+          @include_in_menu = true
           @navigation_menu_name = options[:menu_name]
           @menu_item_options    = default_menu_options.merge options
         end
@@ -26,12 +27,14 @@ module ActiveAdmin
         {
           id: resource_name.plural,
           label: proc{ resource.plural_resource_label },
-          url:   proc{ resource.route_collection_path(params) },
+          url:   proc{ resource.route_collection_path(params, url_options) },
           if:    proc{ authorized?(Auth::READ, menu_resource_class) }
         }
       end
 
-      attr_writer :navigation_menu_name
+      def navigation_menu_name=(menu_name)
+        self.menu_item_options = { menu_name: menu_name }
+      end
 
       def navigation_menu_name
         case @navigation_menu_name ||= DEFAULT_MENU

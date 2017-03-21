@@ -98,10 +98,6 @@ module ActiveAdmin
       # Does the actual work of finding a resource in the database. This
       # method uses the finder method as defined in InheritedResources.
       #
-      # Note that public_send can't be used here because Rails 3.2's
-      # ActiveRecord::Associations::CollectionProxy (belongs_to associations)
-      # mysteriously returns an Enumerator object.
-      #
       # @return [ActiveRecord::Base] An active record object.
       def find_resource
         scoped_collection.send method_for_find, params[:id]
@@ -130,9 +126,6 @@ module ActiveAdmin
 
       # Builds a new resource. This method uses the method_for_build provided
       # by Inherited Resources.
-      #
-      # Note that public_send can't be used here w/ Rails 3.2 & a belongs_to
-      # config, or you'll get undefined method `build' for []:Array.
       #
       # @return [ActiveRecord::Base] An un-saved active record base object
       def build_new_resource
@@ -209,11 +202,10 @@ module ActiveAdmin
 
       def apply_sorting(chain)
         params[:order] ||= active_admin_config.sort_order
-
-        order_clause = OrderClause.new params[:order]
+        order_clause = active_admin_config.order_clause.new(active_admin_config, params[:order])
 
         if order_clause.valid?
-          chain.reorder(order_clause.to_sql(active_admin_config))
+          order_clause.apply(chain)
         else
           chain # just return the chain
         end
@@ -222,14 +214,8 @@ module ActiveAdmin
       # Applies any Ransack search methods to the currently scoped collection.
       # Both `search` and `ransack` are provided, but we use `ransack` to prevent conflicts.
       def apply_filtering(chain)
-        @search = chain.ransack clean_search_params
+        @search = chain.ransack(params[:q] || {})
         @search.result
-      end
-
-      def clean_search_params
-        q = params[:q] || {}
-        q = q.to_unsafe_h if q.respond_to? :to_unsafe_h
-        q.delete_if{ |key, value| value.blank? }
       end
 
       def apply_scoping(chain)

@@ -33,17 +33,17 @@ doc
 pkg
 
 ## Project (specific)
-bin/
 .bundle
 spec/rails
 *.sqlite3-journal
 Gemfile.lock
-Gemfile-*.lock
+gemfiles/rails_[3-5][0-9].gemfile.lock
 capybara*
 viewcumber
-test-rails*
+.test-rails-apps
 public
 .rspec
 .rails-version
 .rbenv-version
 .localeapp/*
+lib/bug_report_templates/tmp
