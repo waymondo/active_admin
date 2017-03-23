@@ -228,9 +228,9 @@ module ActiveAdmin
         # Add sort controller action if class is sortable.
         if config.resource_class.attribute_names.include?("position")
           klass = config.resource_class
-          collection_action :sort, :method => :post do
-            params[:sort].split(",").each_with_index do |id, index|
-              klass.update_all(['position=?', index+1], ['id=?', id])
+          collection_action :sort, method: :post do
+            params[:sort].split(',').each_with_index do |id, index|
+              klass.find(id).update(position: index + 1)
             end
             head :ok
           end

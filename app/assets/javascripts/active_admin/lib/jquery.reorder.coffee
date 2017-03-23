@@ -1,8 +1,7 @@
 $ ->
   $(".index_table").has("td.col-position").each ->
     $table = $(@)
-    id_array = $table.attr('id').split("_")
-    resource = id_array[id_array.length - 1]
+    resource = $table.attr('id').split("index_table_")[1]
     $table.find("tbody").sortable
       update: (e, ui) ->
         $tr = $(@).find("tr")
