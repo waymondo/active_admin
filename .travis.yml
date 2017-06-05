@@ -6,6 +6,10 @@ sudo: false
 
 bundler_args: --without development
 
+branches:
+  only:
+    - master
+
 cache: bundler
 
 before_install:
@@ -19,34 +23,36 @@ script:
   - bundle exec rake
 
 rvm:
-  - jruby-9.1.8.0
-  - 2.2.6
-  - 2.3.3
-  - 2.4.0
+  - jruby-9.1.10.0
+  - 2.1.10
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
 
 gemfile:
-  - gemfiles/rails_40.gemfile
-  - gemfiles/rails_41.gemfile
   - gemfiles/rails_42.gemfile
   - gemfiles/rails_50.gemfile
+  - gemfiles/rails_51.gemfile
 
 env:
   global:
     - JRUBY_OPTS="-J-Xmx1024m --dev --debug"
+    - COVERAGE=true
 
 matrix:
   fast_finish: true
 
-  allow_failures:
-    - rvm: jruby-9.1.8.0
-      gemfile: gemfiles/rails_50.gemfile
-
   exclude:
-    - rvm: 2.4.0
-      gemfile: gemfiles/rails_40.gemfile
+    - rvm: 2.1.10
+      gemfile: gemfiles/rails_50.gemfile
+    - rvm: 2.1.10
+      gemfile: gemfiles/rails_51.gemfile
 
-    - rvm: 2.4.0
-      gemfile: gemfiles/rails_41.gemfile
+  allow_failures:
+    - rvm: jruby-9.1.10.0
+      gemfile: gemfiles/rails_50.gemfile
+    - rvm: jruby-9.1.10.0
+      gemfile: gemfiles/rails_51.gemfile
 
 notifications:
   irc:

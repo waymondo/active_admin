@@ -1,8 +1,10 @@
 # Rails template to build the sample app for specs
 
-if Rails::VERSION::MAJOR == 4 && Rails::VERSION::MINOR >= 2
-  copy_file File.expand_path('../templates/manifest.js', __FILE__), 'app/assets/config/manifest.js', force: true
-end
+copy_file File.expand_path('../templates/manifest.js', __FILE__), 'app/assets/config/manifest.js', force: true
+
+create_file 'app/assets/stylesheets/some-random-css.css'
+create_file 'app/assets/javascripts/some-random-js.js'
+create_file 'app/assets/images/a/favicon.ico'
 
 generate :model, 'post title:string body:text published_date:date author_id:integer ' +
   'position:integer custom_category_id:integer starred:boolean foo_id:integer'
@@ -133,10 +135,12 @@ gsub_file 'config/environments/test.rb', /  config.cache_classes = true/, <<-RUB
 
   config.cache_classes = !ENV['CLASS_RELOADING']
   config.action_mailer.default_url_options = {host: 'example.com'}
-  config.assets.digest = false
+  config.assets.precompile += %w( some-random-css.css some-random-js.js a/favicon.ico )
 
-  if Rails::VERSION::MAJOR >= 4 && Rails::VERSION::MINOR >= 1
-    config.active_record.maintain_test_schema = false
+  config.active_record.maintain_test_schema = false
+
+  if Rails::VERSION::MAJOR >= 5
+    config.active_record.belongs_to_required_by_default = false
   end
 
 RUBY
@@ -169,10 +173,6 @@ directory File.expand_path('../templates/policies', __FILE__), 'app/policies'
 if ENV['RAILS_ENV'] != 'test'
   inject_into_file 'config/routes.rb', "\n  root to: redirect('admin')", after: /.*routes.draw do/
 end
-
-# Devise master doesn't set up its secret key on Rails 4.1
-# https://github.com/plataformatec/devise/issues/2554
-gsub_file 'config/initializers/devise.rb', /# config.secret_key =/, 'config.secret_key ='
 
 rake "db:drop db:create db:migrate", env: 'development'
 rake "db:drop db:create db:migrate", env: 'test'
