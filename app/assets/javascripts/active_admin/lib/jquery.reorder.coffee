@@ -1,6 +1,8 @@
-$ ->
+initSort = ->
   $(".index_table").has("td.col-position").each ->
     $table = $(@)
+    return if $table.data('aa.reorder')
+    $table.data('aa.reorder', true)
     resource = $table.attr('id').split("index_table_")[1]
     $table.find("tbody").sortable
       update: (e, ui) ->
@@ -19,3 +21,6 @@ $ ->
         ui.children().each ->
           $(@).width($(@).width())
         ui
+
+document.addEventListener('turbolinks:load', initSort)
+$ -> initSort()
